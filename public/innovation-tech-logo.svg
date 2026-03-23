@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" fill="none" role="img" aria-label="Innovation Tech">
+  <title>Innovation Tech</title>
+  <!-- Brand mark from innovation-technology (Navbar/Footer), exported as one file in this project -->
+  <rect width="36" height="36" x="0" y="2" rx="10" fill="#F7941D"/>
+  <svg x="6" y="8" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <polygon
+      points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+      fill="none"
+      stroke="#FFFFFF"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+  <text
+    x="44"
+    y="27"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="17"
+    font-weight="700"
+  >
+    <tspan fill="#FFFFFF">Innovation</tspan><tspan fill="#F7941D"> Tech</tspan>
+  </text>
+</svg>
