@@ -6,11 +6,16 @@ import { useNavigate } from 'react-router-dom'
 import { FaSpinner, FaTrashAlt, FaEye, FaChevronRight, FaChevronLeft, FaEnvelope } from 'react-icons/fa'
 import { useQuery } from '@tanstack/react-query'
 import { XCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { AUTH, CONTACTS, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
 
 /** Module scope — avoids input/modal remount focus issues */
 function ContactDetailModal({ contact, onClose }) {
+  const { t, i18n } = useTranslation()
   if (!contact) return null
+  const receivedLabel = contact.created_at
+    ? t('contacts.received_at', { date: new Date(contact.created_at).toLocaleString(i18n.language) })
+    : ''
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -27,31 +32,31 @@ function ContactDetailModal({ contact, onClose }) {
         <div className="p-6 border-b flex justify-between items-start gap-4">
           <div className="flex items-center gap-2 text-primary">
             <FaEnvelope className="text-xl" />
-            <h2 className="text-xl font-bold text-gray-800">Message</h2>
+            <h2 className="text-xl font-bold text-gray-800">{t('contacts.modal_title')}</h2>
           </div>
-          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-800 p-1" aria-label="Close">
+          <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-800 p-1" aria-label={t('common.close')}>
             <XCircle size={28} />
           </button>
         </div>
         <div className="p-6 space-y-4 text-sm">
           <div>
-            <h3 className="text-xs font-semibold uppercase text-gray-500">From</h3>
+            <h3 className="text-xs font-semibold uppercase text-gray-500">{t('contacts.from')}</h3>
             <p className="mt-1 font-medium text-gray-900">{contact.name}</p>
             <a href={`mailto:${contact.email}`} className="text-blue-600 hover:underline">
               {contact.email}
             </a>
           </div>
           <div>
-            <h3 className="text-xs font-semibold uppercase text-gray-500">Subject</h3>
+            <h3 className="text-xs font-semibold uppercase text-gray-500">{t('contacts.subject')}</h3>
             <p className="mt-1 text-gray-800">{contact.subject ?? '—'}</p>
           </div>
           <div>
-            <h3 className="text-xs font-semibold uppercase text-gray-500">Message</h3>
+            <h3 className="text-xs font-semibold uppercase text-gray-500">{t('contacts.message')}</h3>
             <p className="mt-1 text-gray-800 whitespace-pre-wrap">{contact.message ?? '—'}</p>
           </div>
           {contact.created_at && (
             <p className="text-xs text-gray-500 pt-2 border-t">
-              Received {new Date(contact.created_at).toLocaleString()}
+              {receivedLabel}
             </p>
           )}
         </div>
@@ -61,6 +66,7 @@ function ContactDetailModal({ contact, onClose }) {
 }
 
 export default function ContactsDataTable({ contacts, loading, refetch }) {
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [filters, setFilters] = useState({ global: '', name: '', email: '', subject: '' })
   const [currentPage, setCurrentPage] = useState(1)
@@ -88,11 +94,11 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
     setShowDeleteConfirm(false)
     try {
       await axios.delete(CONTACTS.delete(contactToDelete), { headers: authHeaders() })
-      toast.success('Contact deleted', { duration: 2000 })
+      toast.success(t('common.success'), { duration: 2000 })
       if (detailContact?.id === contactToDelete) setDetailContact(null)
       refetch()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Delete failed', { duration: 3000 })
+      toast.error(error.response?.data?.message || t('common.error'), { duration: 3000 })
       if (error.response?.status === 401) {
         localStorage.removeItem('userToken')
         navigate('/login')
@@ -125,8 +131,11 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
     return (
       <div className="flex justify-between items-center mt-4 px-4 pb-1">
         <div className="text-xs">
-          Showing {(currentPage - 1) * rowsPerPage + 1}-{Math.min(currentPage * rowsPerPage, filtered.length)} of{' '}
-          {filtered.length}
+          {t('pagination.showing', {
+            start: (currentPage - 1) * rowsPerPage + 1,
+            end: Math.min(currentPage * rowsPerPage, filtered.length),
+            total: filtered.length,
+          })}
         </div>
         <div className="flex gap-1">
           <button
@@ -135,18 +144,16 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
             disabled={currentPage === 1}
             className="p-1 disabled:opacity-50"
           >
-            <FaChevronLeft className="h-4 w-4" />
+            <FaChevronLeft className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
           </button>
-          <span className="px-3 py-1">
-            Page {currentPage} of {totalPages}
-          </span>
+          <span className="px-3 py-1">{t('pagination.page_of', { current: currentPage, total: totalPages })}</span>
           <button
             type="button"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             className="p-1 disabled:opacity-50"
           >
-            <FaChevronRight className="h-4 w-4" />
+            <FaChevronRight className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
           </button>
         </div>
       </div>
@@ -160,7 +167,7 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
           type="text"
           value={filters.global}
           onChange={(e) => handleFilterChange('global', e.target.value)}
-          placeholder="Search name, email, subject, message…"
+          placeholder={t('contacts.search_placeholder')}
           className="px-3 py-2 rounded-xl shadow-sm focus:outline-2 focus:outline-primary w-full border border-primary transition-all"
         />
       </div>
@@ -172,7 +179,7 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
               <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input
                   type="text"
-                  placeholder="Name"
+                  placeholder={t('common.name')}
                   value={filters.name}
                   onChange={(e) => handleFilterChange('name', e.target.value)}
                   className="text-xs p-1 border rounded w-full max-w-[140px]"
@@ -181,7 +188,7 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
               <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input
                   type="text"
-                  placeholder="Email"
+                  placeholder={t('common.email')}
                   value={filters.email}
                   onChange={(e) => handleFilterChange('email', e.target.value)}
                   className="text-xs p-1 border rounded w-full max-w-[180px]"
@@ -190,14 +197,14 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
               <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input
                   type="text"
-                  placeholder="Subject"
+                  placeholder={t('contacts.subject')}
                   value={filters.subject}
                   onChange={(e) => handleFilterChange('subject', e.target.value)}
                   className="text-xs p-1 border rounded w-full max-w-[140px]"
                 />
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Received</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.received')}</th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 text-sm">
@@ -206,14 +213,14 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
                 <td colSpan="5" className="px-3 py-4 text-center">
                   <div className="flex justify-center items-center gap-2">
                     <FaSpinner className="animate-spin" size={18} />
-                    Loading contacts…
+                    {t('contacts.loading')}
                   </div>
                 </td>
               </tr>
             ) : pageRows.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-3 py-4 text-center text-gray-500">
-                  No contact submissions
+                  {t('contacts.empty')}
                 </td>
               </tr>
             ) : (
@@ -234,7 +241,7 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
                           type="button"
                           className="text-blue-500 hover:text-blue-700 p-1"
                           onClick={() => setDetailContact(c)}
-                          aria-label="View message"
+                          aria-label={t('common.view')}
                         >
                           <FaEye size={18} />
                         </button>
@@ -280,18 +287,18 @@ export default function ContactsDataTable({ contacts, loading, refetch }) {
             className="bg-white rounded-lg shadow-xl w-full max-w-md p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-medium text-gray-900">Delete submission</h3>
-            <p className="mt-2 text-sm text-gray-500">This cannot be undone.</p>
+            <h3 className="text-lg font-medium text-gray-900">{t('contacts.delete_title')}</h3>
+            <p className="mt-2 text-sm text-gray-500">{t('contacts.delete_body')}</p>
             <div className="mt-5 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button type="button" onClick={handleDelete} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-                Delete
+                {t('common.delete')}
               </button>
             </div>
           </motion.div>

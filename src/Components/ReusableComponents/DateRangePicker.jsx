@@ -1,7 +1,9 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function DateRangePicker({ onDateChange, initialRange }) {
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState(initialRange?.startDate || null);
   const [endDate, setEndDate] = useState(initialRange?.endDate || null);
   const [open, setOpen] = useState(false);
@@ -62,7 +64,7 @@ export default function DateRangePicker({ onDateChange, initialRange }) {
   const toLabel = () => {
     const s = toYMD(startDate);
     const e = toYMD(endDate);
-    if (!s && !e) return 'Select date range';
+    if (!s && !e) return t('date_range.select_range');
     if (s && !e) return `${s} → ...`;
     if (!s && e) return `... → ${e}`;
     return `${s} → ${e}`;
@@ -87,7 +89,7 @@ export default function DateRangePicker({ onDateChange, initialRange }) {
         ref={buttonRef}
         className="w-full text-left text-xs p-1.5 border rounded hover:bg-gray-50"
         onClick={() => setOpen((o) => !o)}
-        title="Filter by created date range"
+        title={t('date_range.filter_title')}
       >
         {toLabel()}
       </button>
@@ -98,14 +100,14 @@ export default function DateRangePicker({ onDateChange, initialRange }) {
           style={{ position: 'fixed', top: popoverPos.top, left: popoverPos.left, width: popoverPos.width, zIndex: 9999 }}
         >
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] text-gray-500">From</label>
+            <label className="text-[10px] text-gray-500">{t('date_range.from')}</label>
             <input
               type="date"
               value={toYMD(startDate)}
               onChange={(e) => setStartDate(e.target.value ? new Date(`${e.target.value}T00:00:00`) : null)}
               className="text-xs p-1 border rounded w-full"
             />
-            <label className="text-[10px] text-gray-500">To</label>
+            <label className="text-[10px] text-gray-500">{t('date_range.to')}</label>
             <input
               type="date"
               value={toYMD(endDate)}
@@ -113,8 +115,8 @@ export default function DateRangePicker({ onDateChange, initialRange }) {
               className="text-xs p-1 border rounded w-full"
             />
             <div className="flex justify-between gap-2 pt-1">
-              <button type="button" className="px-2 py-1 text-xs bg-gray-100 rounded" onClick={clear}>Clear</button>
-              <button type="button" className="px-2 py-1 text-xs bg-primary text-white rounded" onClick={apply}>Apply</button>
+              <button type="button" className="px-2 py-1 text-xs bg-gray-100 rounded" onClick={clear}>{t('date_range.clear')}</button>
+              <button type="button" className="px-2 py-1 text-xs bg-primary text-white rounded" onClick={apply}>{t('date_range.apply')}</button>
             </div>
           </div>
         </div>,

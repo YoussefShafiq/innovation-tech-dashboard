@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Login from './Components/Auth/Login'
 import ProtectedRoute from './Components/Auth/ProtectedRoute'
 import Layout from './Components/Layout/Layout'
@@ -14,6 +15,18 @@ import UserSetting from './Components/Pages/UserSetting'
 import Contacts from './Components/Pages/Contacts'
 import Settings from './Components/Pages/Settings'
 import ErrorPage from './Components/errorHandling/ErrorPage'
+import Admins from './Components/Pages/Admins.jsx'
+import Partners from './Components/Pages/Partners.jsx'
+
+function AppToaster() {
+  const { i18n } = useTranslation()
+  return (
+    <Toaster
+      position={i18n.dir() === 'rtl' ? 'bottom-left' : 'bottom-right'}
+      reverseOrder={false}
+    />
+  )
+}
 
 function App() {
 
@@ -22,8 +35,10 @@ function App() {
     {
       path: '/', element: <ProtectedRoute><Layout /></ProtectedRoute>, errorElement: <ErrorPage />, children: [
         { index: true, element: <ProtectedRoute><Home /></ProtectedRoute> },
+        { path: '/admins', element: <ProtectedRoute><Admins /></ProtectedRoute> },
         { path: '/services', element: <ProtectedRoute><Services /></ProtectedRoute> },
         { path: '/contacts', element: <ProtectedRoute><Contacts /></ProtectedRoute> },
+        { path: '/partners', element: <ProtectedRoute><Partners /></ProtectedRoute> },
         { path: '/settings', element: <ProtectedRoute><Settings /></ProtectedRoute> },
         { path: '/user-setting', element: <ProtectedRoute><UserSetting /></ProtectedRoute> },
 
@@ -45,10 +60,7 @@ function App() {
       <SidebarContextProvider>
         <QueryClientProvider client={query}>
           <RouterProvider router={router} />
-          <Toaster
-            position='bottom-right'
-            reverseOrder={false}
-          />
+          <AppToaster />
         </QueryClientProvider>
       </SidebarContextProvider>
     </>

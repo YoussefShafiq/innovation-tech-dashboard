@@ -195,6 +195,7 @@ const TableCell = TableCellExtension.extend({
 });
 import { useCallback, useRef, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import './styles.scss';
 
 // Utility function to generate slug from text
@@ -706,6 +707,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
     const altInputRef = useRef(null);
     const videoAltInputRef = useRef(null);
     const youtubeInputRef = useRef(null);
+    const { t } = useTranslation();
 
     if (!editor) {
         return null;
@@ -753,7 +755,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
             }
         } catch (error) {
             console.error('Image upload failed:', error);
-            toast.error('Failed to upload image. Please try again.');
+            toast.error(t('editor.toast_image_upload'));
         } finally {
             setIsUploading(false);
             event.target.value = '';
@@ -766,14 +768,14 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
 
         // Check file size (100MB limit)
         if (file.size > 100 * 1024 * 1024) {
-            toast.error('Video file size must be less than 100MB');
+            toast.error(t('editor.toast_video_size'));
             return;
         }
 
         // Check file type
         const allowedTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/wmv', 'video/webm'];
         if (!allowedTypes.includes(file.type)) {
-            toast.error('Please select a valid video file (MP4, MOV, AVI, WMV, WebM)');
+            toast.error(t('editor.toast_video_type'));
             return;
         }
 
@@ -815,7 +817,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
             }
         } catch (error) {
             console.error('Video upload failed:', error);
-            toast.error('Failed to upload video. Please try again.');
+            toast.error(t('editor.toast_video_upload'));
         } finally {
             setIsVideoUploading(false);
             event.target.value = '';
@@ -825,7 +827,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
     const handleYoutubeSubmit = async (e) => {
         e.preventDefault();
         if (!youtubeUrl.trim()) {
-            toast.error('Please enter a YouTube URL');
+            toast.error(t('editor.toast_youtube_empty'));
             return;
         }
 
@@ -843,7 +845,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
         }
 
         if (!youtubeId) {
-            toast.error('Invalid YouTube URL. Please enter a valid YouTube video URL.');
+            toast.error(t('editor.toast_youtube_invalid'));
             return;
         }
 
@@ -854,7 +856,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
             editor.chain().focus().setYouTubeVideo({
                 videoId: youtubeId,
                 alt: '',
-                title: 'YouTube video player',
+                title: t('editor.youtube_player_default'),
                 description: '',
                 width: '100%',
                 height: '400'
@@ -871,7 +873,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
 
             // Fallback: insert as a simple text placeholder
             editor.chain().focus().insertContent(`[YouTube Video: ${youtubeId}]`).run();
-            toast.error('Failed to embed YouTube video. Please try again.');
+            toast.error(t('editor.toast_youtube_embed'));
         }
 
         // After YouTube video is inserted, show meta input
@@ -1014,7 +1016,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
         const selectedText = editor.state.doc.textBetween(from, to, ' ');
 
         if (selectedText.trim() === '') {
-            toast.error('Please select some text first');
+            toast.error(t('editor.toast_select_text'));
             return;
         }
 
@@ -1216,7 +1218,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     }}
                     disabled={!editor.can().chain().focus().toggleBold().run()}
                     className={editor.isActive('bold') ? 'is-active' : ''}
-                    title="Bold"
+                    title={t('editor.bold')}
                 >
                     <Bold size={16} />
                 </button>
@@ -1227,7 +1229,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     }}
                     disabled={!editor.can().chain().focus().toggleItalic().run()}
                     className={editor.isActive('italic') ? 'is-active' : ''}
-                    title="Italic"
+                    title={t('editor.italic')}
                 >
                     <Italic size={16} />
                 </button>
@@ -1238,7 +1240,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     }}
                     disabled={!editor.can().chain().focus().toggleStrike().run()}
                     className={editor.isActive('strike') ? 'is-active' : ''}
-                    title="Strikethrough"
+                    title={t('editor.strikethrough')}
                 >
                     <Strikethrough size={16} />
                 </button>
@@ -1249,7 +1251,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     }}
                     disabled={!editor.can().chain().focus().toggleUnderline().run()}
                     className={editor.isActive('underline') ? 'is-active' : ''}
-                    title="Underline"
+                    title={t('editor.underline')}
                 >
                     <UnderlineIcon size={16} />
                 </button>
@@ -1260,7 +1262,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     }}
                     disabled={!editor.can().chain().focus().toggleDynamicDate().run()}
                     className={editor.isActive('dynamicDate') ? 'is-active' : ''}
-                    title="Dynamic Date"
+                    title={t('editor.dynamic_date')}
                 >
                     <Calendar size={16} />
                 </button>
@@ -1275,7 +1277,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleHeading({ level: 1 }).run();
                     }}
                     className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
-                    title="Heading 1"
+                    title={t('editor.heading_n', { n: 1 })}
                 >
                     <Heading1 size={16} />
                 </button>
@@ -1285,7 +1287,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleHeading({ level: 2 }).run();
                     }}
                     className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
-                    title="Heading 2"
+                    title={t('editor.heading_n', { n: 2 })}
                 >
                     <Heading2 size={16} />
                 </button>
@@ -1295,7 +1297,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleHeading({ level: 3 }).run();
                     }}
                     className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
-                    title="Heading 3"
+                    title={t('editor.heading_n', { n: 3 })}
                 >
                     <Heading3 size={16} />
                 </button>
@@ -1305,7 +1307,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleHeading({ level: 4 }).run();
                     }}
                     className={editor.isActive('heading', { level: 4 }) ? 'is-active' : ''}
-                    title="Heading 4"
+                    title={t('editor.heading_n', { n: 4 })}
                 >
                     <Heading4 size={16} />
                 </button>
@@ -1315,7 +1317,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleHeading({ level: 5 }).run();
                     }}
                     className={editor.isActive('heading', { level: 5 }) ? 'is-active' : ''}
-                    title="Heading 5"
+                    title={t('editor.heading_n', { n: 5 })}
                 >
                     <Heading5 size={16} />
                 </button>
@@ -1325,7 +1327,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleHeading({ level: 6 }).run();
                     }}
                     className={editor.isActive('heading', { level: 6 }) ? 'is-active' : ''}
-                    title="Heading 6"
+                    title={t('editor.heading_n', { n: 6 })}
                 >
                     <Heading6 size={16} />
                 </button>
@@ -1340,7 +1342,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleBulletList().run();
                     }}
                     className={editor.isActive('bulletList') ? 'is-active' : ''}
-                    title="Bullet List"
+                    title={t('editor.bullet_list')}
                 >
                     <List size={16} />
                 </button>
@@ -1350,7 +1352,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleOrderedList().run();
                     }}
                     className={editor.isActive('orderedList') ? 'is-active' : ''}
-                    title="Numbered List"
+                    title={t('editor.numbered_list')}
                 >
                     <ListOrdered size={16} />
                 </button>
@@ -1375,7 +1377,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         }
                     }}
                     className={editor.isActive('blockquote') && editor.getAttributes('blockquote').class !== 'info-box' ? 'is-active' : ''}
-                    title="Blockquote"
+                    title={t('editor.blockquote')}
                 >
                     <Quote size={16} />
                 </button>
@@ -1392,7 +1394,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         }
                     }}
                     className={editor.isActive('infoBox') ? 'is-active' : ''}
-                    title="Info Box"
+                    title={t('editor.info_box')}
                 >
                     <InfoIcon size={16} />
                 </button>
@@ -1402,7 +1404,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().toggleCodeBlock().run();
                     }}
                     className={editor.isActive('codeBlock') ? 'is-active' : ''}
-                    title="Code Block"
+                    title={t('editor.code_block')}
                 >
                     <Code2 size={16} />
                 </button>
@@ -1411,7 +1413,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         e.preventDefault();
                         editor.chain().focus().setHorizontalRule().run();
                     }}
-                    title="Horizontal Rule"
+                    title={t('editor.horizontal_rule')}
                 >
                     <Minus size={16} />
                 </button>
@@ -1426,7 +1428,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().setTextAlign('left').run();
                     }}
                     className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}
-                    title="Align Left"
+                    title={t('editor.align_left')}
                 >
                     <AlignLeft size={16} />
                 </button>
@@ -1436,7 +1438,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().setTextAlign('center').run();
                     }}
                     className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}
-                    title="Align Center"
+                    title={t('editor.align_center')}
                 >
                     <AlignCenter size={16} />
                 </button>
@@ -1446,7 +1448,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().setTextAlign('right').run();
                     }}
                     className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}
-                    title="Align Right"
+                    title={t('editor.align_right')}
                 >
                     <AlignRight size={16} />
                 </button>
@@ -1456,7 +1458,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().setTextAlign('justify').run();
                     }}
                     className={editor.isActive({ textAlign: 'justify' }) ? 'is-active' : ''}
-                    title="Justify"
+                    title={t('editor.justify')}
                 >
                     <AlignJustify size={16} />
                 </button>
@@ -1468,7 +1470,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                 <button
                     onClick={handleLinkClick}
                     className={editor.isActive('link') ? 'is-active' : ''}
-                    title="Add/Edit Link"
+                    title={t('editor.add_edit_link')}
                 >
                     <Link size={16} />
                 </button>
@@ -1476,7 +1478,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                 {editor.isActive('link') && (
                     <button
                         onClick={handleUnlink}
-                        title="Remove Link"
+                        title={t('editor.remove_link')}
                     >
                         <Unlink size={16} />
                     </button>
@@ -1499,11 +1501,11 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         e.preventDefault();
                         fileInputRef.current.click();
                     }}
-                    title="Upload Image"
+                    title={t('editor.upload_image')}
                     disabled={isUploading}
                     className={isUploading ? 'is-uploading' : ''}
                 >
-                    {isUploading ? 'Uploading...' : <ImageIcon size={16} />}
+                    {isUploading ? t('editor.uploading') : <ImageIcon size={16} />}
                 </button>
             </div>
 
@@ -1523,11 +1525,11 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         e.preventDefault();
                         videoFileInputRef.current.click();
                     }}
-                    title="Upload Video"
+                    title={t('editor.upload_video')}
                     disabled={isVideoUploading}
                     className={isVideoUploading ? 'is-uploading' : ''}
                 >
-                    {isVideoUploading ? 'Uploading...' : <Video size={16} />}
+                    {isVideoUploading ? t('editor.uploading') : <Video size={16} />}
                 </button>
                 <button
                     onClick={(e) => {
@@ -1537,7 +1539,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                             youtubeInputRef.current?.focus();
                         }, 100);
                     }}
-                    title="Add YouTube Video"
+                    title={t('editor.add_youtube')}
                 >
                     <Youtube size={16} />
                 </button>
@@ -1549,7 +1551,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                 <button
                     onClick={handleTableClick}
                     className={editor.isActive('table') ? 'is-active' : ''}
-                    title="Table"
+                    title={t('editor.table')}
                 >
                     <Table size={16} />
                 </button>
@@ -1564,7 +1566,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().undo().run();
                     }}
                     disabled={!editor.can().undo()}
-                    title="Undo"
+                    title={t('editor.undo')}
                 >
                     <Undo size={16} />
                 </button>
@@ -1574,7 +1576,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         editor.chain().focus().redo().run();
                     }}
                     disabled={!editor.can().redo()}
-                    title="Redo"
+                    title={t('editor.redo')}
                 >
                     <Redo size={16} />
                 </button>
@@ -1585,10 +1587,10 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                 <div className="table-controls-modal">
                     <div className="table-controls-overlay" onClick={() => setShowTableControls(false)} />
                     <div className="table-controls-container">
-                        <h4>Create Table</h4>
+                        <h4>{t('editor.create_table_title')}</h4>
                         <div className="table-controls-grid">
                             <div className="table-control-row">
-                                <label>Rows:</label>
+                                <label>{t('editor.rows')}</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -1598,7 +1600,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                                 />
                             </div>
                             <div className="table-control-row">
-                                <label>Columns:</label>
+                                <label>{t('editor.columns')}</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -1610,10 +1612,10 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                         </div>
                         <div className="table-controls-buttons">
                             <button onClick={handleCreateTable} className="table-create-btn">
-                                Create Table
+                                {t('editor.create_table_btn')}
                             </button>
                             <button onClick={() => setShowTableControls(false)} className="table-cancel-btn">
-                                Cancel
+                                {t('common.cancel')}
                             </button>
                         </div>
                     </div>
@@ -1624,16 +1626,16 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
             {editor?.isActive('table') && (
                 <div className="table-edit-controls">
                     <div className="table-controls-group">
-                        <button onClick={handleAddRow} title="Add Row">
+                        <button onClick={handleAddRow} title={t('editor.add_row')}>
                             <Plus size={14} />
                         </button>
-                        <button onClick={handleAddColumn} title="Add Column">
+                        <button onClick={handleAddColumn} title={t('editor.add_column')}>
                             <Plus size={14} style={{ transform: 'rotate(90deg)' }} />
                         </button>
-                        <button onClick={handleDeleteRow} title="Delete Row">
+                        <button onClick={handleDeleteRow} title={t('editor.delete_row')}>
                             <Trash2 size={14} />
                         </button>
-                        <button onClick={handleDeleteColumn} title="Delete Column">
+                        <button onClick={handleDeleteColumn} title={t('editor.delete_column')}>
                             <Trash2 size={14} style={{ transform: 'rotate(90deg)' }} />
                         </button>
                     </div>
@@ -1641,10 +1643,10 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     <div className="table-controls-divider"></div>
 
                     <div className="table-controls-group">
-                        <button onClick={handleMergeCells} title="Merge Cells">
+                        <button onClick={handleMergeCells} title={t('editor.merge_cells')}>
                             <Merge size={14} />
                         </button>
-                        <button onClick={handleSplitCell} title="Split Cell">
+                        <button onClick={handleSplitCell} title={t('editor.split_cell')}>
                             <Split size={14} />
                         </button>
                     </div>
@@ -1652,13 +1654,13 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     <div className="table-controls-divider"></div>
 
                     <div className="table-controls-group">
-                        <button onClick={handleCellAlignLeft} title="Align Left">
+                        <button onClick={handleCellAlignLeft} title={t('editor.align_left')}>
                             <AlignLeft size={14} />
                         </button>
-                        <button onClick={handleCellAlignCenter} title="Align Center">
+                        <button onClick={handleCellAlignCenter} title={t('editor.align_center')}>
                             <AlignCenter size={14} />
                         </button>
-                        <button onClick={handleCellAlignRight} title="Align Right">
+                        <button onClick={handleCellAlignRight} title={t('editor.align_right')}>
                             <AlignRight size={14} />
                         </button>
                     </div>
@@ -1666,13 +1668,13 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     <div className="table-controls-divider"></div>
 
                     <div className="table-controls-group">
-                        <button onClick={handleToggleHeaderRow} title="Toggle Header Row">
+                        <button onClick={handleToggleHeaderRow} title={t('editor.toggle_header_row')}>
                             H
                         </button>
-                        <button onClick={handleToggleHeaderColumn} title="Toggle Header Column">
+                        <button onClick={handleToggleHeaderColumn} title={t('editor.toggle_header_column')}>
                             H|
                         </button>
-                        <button onClick={handleDeleteTable} title="Delete Table">
+                        <button onClick={handleDeleteTable} title={t('editor.delete_table')}>
                             <Trash2 size={14} color="#ef4444" />
                         </button>
                     </div>
@@ -1690,7 +1692,7 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                                 type="text"
                                 value={linkUrl}
                                 onChange={(e) => setLinkUrl(e.target.value)}
-                                placeholder="Enter URL (e.g., https://example.com)"
+                                placeholder={t('editor.placeholder_url')}
                                 className="link-input"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -1704,10 +1706,10 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                             />
                             <div className="link-input-buttons">
                                 <button type="button" onClick={handleLinkSubmit} className="link-submit-btn">
-                                    {editor.isActive('link') ? 'Update' : 'Add'} Link
+                                    {editor.isActive('link') ? t('editor.link_update') : t('editor.link_add')}
                                 </button>
                                 <button type="button" onClick={handleLinkCancel} className="link-cancel-btn">
-                                    Cancel
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>
@@ -1722,42 +1724,42 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     <div className="link-input-container">
                         <div className="image-meta-form">
                             <div className="form-group">
-                                <label>Alt Text</label>
+                                <label>{t('editor.alt_text')}</label>
                                 <input
                                     ref={altInputRef}
                                     type="text"
                                     value={imageAltText}
                                     onChange={(e) => setImageAltText(e.target.value)}
-                                    placeholder="Enter alt text for accessibility"
+                                    placeholder={t('editor.placeholder_alt')}
                                     className="link-input"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Title</label>
+                                <label>{t('editor.title_label')}</label>
                                 <input
                                     type="text"
                                     value={imageTitle}
                                     onChange={(e) => setImageTitle(e.target.value)}
-                                    placeholder="Enter title text (shown on hover)"
+                                    placeholder={t('editor.placeholder_title')}
                                     className="link-input"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Content</label>
+                                <label>{t('editor.content_label')}</label>
                                 <textarea
                                     value={imageContent}
                                     onChange={(e) => setImageContent(e.target.value)}
-                                    placeholder="Enter additional content or description"
+                                    placeholder={t('editor.placeholder_content')}
                                     className="link-input textarea"
                                     rows={3}
                                 />
                             </div>
                             <div className="link-input-buttons">
                                 <button type="button" onClick={handleImageMetaSubmit} className="link-submit-btn">
-                                    Save Image Details
+                                    {t('editor.save_image_details')}
                                 </button>
                                 <button type="button" onClick={handleImageMetaCancel} className="link-cancel-btn">
-                                    Cancel
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>
@@ -1772,42 +1774,42 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     <div className="link-input-container">
                         <div className="image-meta-form">
                             <div className="form-group">
-                                <label>Alt Text</label>
+                                <label>{t('editor.alt_text')}</label>
                                 <input
                                     ref={videoAltInputRef}
                                     type="text"
                                     value={videoAltText}
                                     onChange={(e) => setVideoAltText(e.target.value)}
-                                    placeholder="Enter alt text for accessibility"
+                                    placeholder={t('editor.placeholder_alt')}
                                     className="link-input"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Title</label>
+                                <label>{t('editor.title_label')}</label>
                                 <input
                                     type="text"
                                     value={videoTitle}
                                     onChange={(e) => setVideoTitle(e.target.value)}
-                                    placeholder="Enter title text (shown on hover)"
+                                    placeholder={t('editor.placeholder_title')}
                                     className="link-input"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Description</label>
+                                <label>{t('editor.description_label')}</label>
                                 <textarea
                                     value={videoDescription}
                                     onChange={(e) => setVideoDescription(e.target.value)}
-                                    placeholder="Enter video description"
+                                    placeholder={t('editor.placeholder_video_desc')}
                                     className="link-input textarea"
                                     rows={3}
                                 />
                             </div>
                             <div className="link-input-buttons">
                                 <button type="button" onClick={handleVideoMetaSubmit} className="link-submit-btn">
-                                    Save Video Details
+                                    {t('editor.save_video_details')}
                                 </button>
                                 <button type="button" onClick={handleVideoMetaCancel} className="link-cancel-btn">
-                                    Cancel
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>
@@ -1821,16 +1823,16 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                     <div className="link-input-overlay" onClick={() => setShowYoutubeInput(false)} />
                     <div className="link-input-container">
                         <div>
-                            <h4>Add YouTube Video</h4>
+                            <h4>{t('editor.add_youtube_title')}</h4>
                             <p className="text-sm text-gray-600 mb-3">
-                                Enter a YouTube URL to embed the video directly in your content.
+                                {t('editor.add_youtube_help')}
                             </p>
                             <input
                                 ref={youtubeInputRef}
                                 type="text"
                                 value={youtubeUrl}
                                 onChange={(e) => setYoutubeUrl(e.target.value)}
-                                placeholder="Enter YouTube URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)"
+                                placeholder={t('editor.placeholder_youtube_url')}
                                 className="link-input"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -1844,10 +1846,10 @@ const MenuBar = ({ uploadImgUrl = '', uploadVideoUrl = 'https://api.nexus.com/ap
                             />
                             <div className="link-input-buttons">
                                 <button type="button" onClick={handleYoutubeSubmit} className="link-submit-btn">
-                                    Embed Video
+                                    {t('editor.embed_video')}
                                 </button>
                                 <button type="button" onClick={() => setShowYoutubeInput(false)} className="link-cancel-btn">
-                                    Cancel
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>
@@ -1875,6 +1877,7 @@ const CustomBubbleMenu = () => {
     const linkInputRef = useRef(null);
     const altInputRef = useRef(null);
     const videoAltInputRef = useRef(null);
+    const { t } = useTranslation();
 
     // return null
 
@@ -2131,7 +2134,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleBold().run();
                         }}
                         className={editor.isActive('bold') ? 'is-active' : ''}
-                        title="Bold"
+                        title={t('editor.bold')}
                     >
                         <Bold size={14} />
                     </button>
@@ -2141,7 +2144,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleItalic().run();
                         }}
                         className={editor.isActive('italic') ? 'is-active' : ''}
-                        title="Italic"
+                        title={t('editor.italic')}
                     >
                         <Italic size={14} />
                     </button>
@@ -2151,7 +2154,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleUnderline().run();
                         }}
                         className={editor.isActive('underline') ? 'is-active' : ''}
-                        title="Underline"
+                        title={t('editor.underline')}
                     >
                         <UnderlineIcon size={14} />
                     </button>
@@ -2161,7 +2164,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleStrike().run();
                         }}
                         className={editor.isActive('strike') ? 'is-active' : ''}
-                        title="Strikethrough"
+                        title={t('editor.strikethrough')}
                     >
                         <Strikethrough size={14} />
                     </button>
@@ -2171,7 +2174,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleHeading({ level: 1 }).run();
                         }}
                         className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
-                        title="Heading 1"
+                        title={t('editor.heading_n', { n: 1 })}
                     >
                         H1
                     </button>
@@ -2181,7 +2184,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleHeading({ level: 2 }).run();
                         }}
                         className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
-                        title="Heading 2"
+                        title={t('editor.heading_n', { n: 2 })}
                     >
                         H2
                     </button>
@@ -2191,7 +2194,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleHeading({ level: 3 }).run();
                         }}
                         className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
-                        title="Heading 3"
+                        title={t('editor.heading_n', { n: 3 })}
                     >
                         H3
                     </button>
@@ -2201,7 +2204,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleHeading({ level: 4 }).run();
                         }}
                         className={editor.isActive('heading', { level: 4 }) ? 'is-active' : ''}
-                        title="Heading 4"
+                        title={t('editor.heading_n', { n: 4 })}
                     >
                         H4
                     </button>
@@ -2211,7 +2214,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleHeading({ level: 5 }).run();
                         }}
                         className={editor.isActive('heading', { level: 5 }) ? 'is-active' : ''}
-                        title="Heading 5"
+                        title={t('editor.heading_n', { n: 5 })}
                     >
                         H5
                     </button>
@@ -2221,7 +2224,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleHeading({ level: 6 }).run();
                         }}
                         className={editor.isActive('heading', { level: 6 }) ? 'is-active' : ''}
-                        title="Heading 6"
+                        title={t('editor.heading_n', { n: 6 })}
                     >
                         H6
                     </button> */}
@@ -2233,7 +2236,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleBulletList().run();
                         }}
                         className={editor.isActive('bulletList') ? 'is-active' : ''}
-                        title="Bullet List"
+                        title={t('editor.bullet_list')}
                     >
                         <List size={14} />
                     </button>
@@ -2243,7 +2246,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleOrderedList().run();
                         }}
                         className={editor.isActive('orderedList') ? 'is-active' : ''}
-                        title="Numbered List"
+                        title={t('editor.numbered_list')}
                     >
                         <ListOrdered size={14} />
                     </button> */}
@@ -2252,7 +2255,7 @@ const CustomBubbleMenu = () => {
                     <button
                         onClick={handleBubbleLinkClick}
                         className={editor.isActive('link') ? 'is-active' : ''}
-                        title="Add/Edit Link"
+                        title={t('editor.add_edit_link')}
                     >
                         <Link size={14} />
                     </button>
@@ -2262,7 +2265,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().toggleBlockquote().run();
                         }}
                         className={editor.isActive('blockquote') ? 'is-active' : ''}
-                        title="info icon"
+                        title={t('editor.info_box')}
                     >
                         <InfoIcon size={16} />
                     </button> */}
@@ -2274,7 +2277,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().setTextAlign('left').run();
                         }}
                         className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}
-                        title="Align Left"
+                        title={t('editor.align_left')}
                     >
                         <AlignLeft size={14} />
                     </button>
@@ -2284,7 +2287,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().setTextAlign('center').run();
                         }}
                         className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}
-                        title="Align Center"
+                        title={t('editor.align_center')}
                     >
                         <AlignCenter size={14} />
                     </button>
@@ -2294,7 +2297,7 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().setTextAlign('right').run();
                         }}
                         className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}
-                        title="Align Right"
+                        title={t('editor.align_right')}
                     >
                         <AlignRight size={14} />
                     </button>
@@ -2304,14 +2307,14 @@ const CustomBubbleMenu = () => {
                             editor.chain().focus().setTextAlign('justify').run();
                         }}
                         className={editor.isActive({ textAlign: 'justify' }) ? 'is-active' : ''}
-                        title="Justify"
+                        title={t('editor.justify')}
                     >
                         <AlignJustify size={14} />
                     </button> */}
                     {editor.isActive('link') && (
                         <button
                             onClick={handleBubbleUnlink}
-                            title="Remove Link"
+                            title={t('editor.remove_link')}
                         >
                             <Unlink size={14} />
                         </button>
@@ -2321,7 +2324,7 @@ const CustomBubbleMenu = () => {
                     {editor.isActive('image') && (
                         <button
                             onClick={handleBubbleImageMetaClick}
-                            title="Edit Image Details"
+                            title={t('editor.edit_image_details')}
                         >
                             <ImageIcon size={14} />
                         </button>
@@ -2331,7 +2334,7 @@ const CustomBubbleMenu = () => {
                     {(editor.isActive('video') || editor.getHTML().includes('data-youtube-video')) && (
                         <button
                             onClick={handleBubbleVideoMetaClick}
-                            title="Edit Video Details"
+                            title={t('editor.edit_video_details')}
                         >
                             <Video size={14} />
                         </button>
@@ -2343,32 +2346,32 @@ const CustomBubbleMenu = () => {
                     <div className="bubble-link-input">
                         <div className="image-meta-form">
                             <div className="form-group">
-                                <label>Alt:</label>
+                                <label>{t('editor.bubble_alt_label')}</label>
                                 <input
                                     ref={altInputRef}
                                     type="text"
                                     value={imageAltText}
                                     onChange={(e) => setImageAltText(e.target.value)}
-                                    placeholder="Alt text"
+                                    placeholder={t('editor.bubble_alt')}
                                     className="bubble-link-field !w-full"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Title:</label>
+                                <label>{t('editor.bubble_title_label')}</label>
                                 <input
                                     type="text"
                                     value={imageTitle}
                                     onChange={(e) => setImageTitle(e.target.value)}
-                                    placeholder="Title"
+                                    placeholder={t('editor.bubble_title')}
                                     className="bubble-link-field !w-full"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Content:</label>
+                                <label>{t('editor.bubble_content_label')}</label>
                                 <textarea
                                     value={imageContent}
                                     onChange={(e) => setImageContent(e.target.value)}
-                                    placeholder="Content"
+                                    placeholder={t('editor.bubble_content')}
                                     className="bubble-link-field textarea"
                                     rows={2}
                                 />
@@ -2402,7 +2405,7 @@ const CustomBubbleMenu = () => {
                                 type="text"
                                 value={linkUrl}
                                 onChange={(e) => setLinkUrl(e.target.value)}
-                                placeholder="Enter URL"
+                                placeholder={t('editor.bubble_placeholder_url')}
                                 className="bubble-link-field"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -2437,32 +2440,32 @@ const CustomBubbleMenu = () => {
                     <div className="bubble-link-input">
                         <div className="image-meta-form">
                             <div className="form-group">
-                                <label>Alt:</label>
+                                <label>{t('editor.bubble_alt_label')}</label>
                                 <input
                                     ref={videoAltInputRef}
                                     type="text"
                                     value={videoAltText}
                                     onChange={(e) => setVideoAltText(e.target.value)}
-                                    placeholder="Alt text"
+                                    placeholder={t('editor.bubble_alt')}
                                     className="bubble-link-field !w-full"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Title:</label>
+                                <label>{t('editor.bubble_title_label')}</label>
                                 <input
                                     type="text"
                                     value={videoTitle}
                                     onChange={(e) => setVideoTitle(e.target.value)}
-                                    placeholder="Title"
+                                    placeholder={t('editor.bubble_title')}
                                     className="bubble-link-field !w-full"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Desc:</label>
+                                <label>{t('editor.bubble_desc_label')}</label>
                                 <textarea
                                     value={videoDescription}
                                     onChange={(e) => setVideoDescription(e.target.value)}
-                                    placeholder="Description"
+                                    placeholder={t('editor.bubble_desc')}
                                     className="bubble-link-field textarea"
                                     rows={2}
                                 />

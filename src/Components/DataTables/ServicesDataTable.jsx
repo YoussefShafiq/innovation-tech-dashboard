@@ -13,54 +13,225 @@ import {
   FaCheck,
   FaTimes,
 } from 'react-icons/fa'
+import {
+  MdCloudDone,
+  MdSecurity,
+  MdAutoGraph,
+  MdDevices,
+  MdIntegrationInstructions,
+  MdSupportAgent,
+  MdStorage,
+  MdPhone,
+} from 'react-icons/md'
 import { useQuery } from '@tanstack/react-query'
 import { XCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { AUTH, SERVICES, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
+
+const SUPPORTED_ICONS = {
+  MdCloudDone,
+  MdSecurity,
+  MdAutoGraph,
+  MdDevices,
+  MdIntegrationInstructions,
+  MdSupportAgent,
+  MdStorage,
+  MdPhone,
+}
+
+const emptyAr = () => ({
+  title: '',
+  description: '',
+  long_description: '',
+  highlights: '',
+})
 
 function formatTags(tags) {
   if (tags == null || tags === '') return ''
-  if (Array.isArray(tags))
-    return tags.map((t) => String(t).trim()).filter(Boolean).join(', ')
+  if (Array.isArray(tags)) return tags.map((t) => String(t).trim()).filter(Boolean).join(', ')
   return String(tags)
 }
 
-function buildServiceFormData({ title, description, slug, icon, tags }) {
+/** API may return highlights as string[], JSON string, or newline text from translations */
+function formatHighlightsForForm(highlights) {
+  if (highlights == null || highlights === '') return ''
+  if (Array.isArray(highlights)) return highlights.filter(Boolean).join('\n')
+  const s = String(highlights).trim()
+  if (s.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(s)
+      if (Array.isArray(parsed)) return parsed.filter(Boolean).join('\n')
+    } catch {
+      /* ignore */
+    }
+  }
+  return s
+}
+
+function normalizeTranslations(svc) {
+  const raw = svc.translations || {}
+  const ar = raw.ar || {}
+  return {
+    ar: {
+      title: ar.title ?? '',
+      description: ar.description ?? '',
+      long_description: ar.long_description ?? '',
+      highlights: formatHighlightsForForm(ar.highlights),
+    },
+  }
+}
+
+function ServiceIconPicker({ value, onChange }) {
+  return (
+    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-1">
+      {Object.entries(SUPPORTED_ICONS).map(([name, Icon]) => (
+        <button
+          key={name}
+          type="button"
+          onClick={() => onChange(name)}
+          className={`p-2 rounded-lg border-2 transition-all flex flex-col items-center justify-center gap-1 ${
+            value === name
+              ? 'border-primary bg-primary/5 text-primary'
+              : 'border-gray-100 hover:border-gray-200 text-gray-400'
+          }`}
+          title={name}
+        >
+          <Icon size={20} />
+          <span className="text-[9px] truncate w-full text-center">{name.replace('Md', '')}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function buildServiceFormData({ title, description, long_description, slug, icon, tags, highlights, translations }) {
   const fd = new FormData()
   fd.append('title', title)
   fd.append('description', description ?? '')
+  fd.append('long_description', long_description ?? '')
   fd.append('slug', slug)
   fd.append('icon', icon ?? '')
   fd.append('tags', tags ?? '')
+  fd.append('highlights', highlights ?? '')
+  if (translations) {
+    Object.keys(translations).forEach((locale) => {
+      Object.keys(translations[locale]).forEach((field) => {
+        fd.append(`translations[${locale}][${field}]`, translations[locale][field] ?? '')
+      })
+    })
+  }
   return fd
 }
 
-/** Module scope — defining inside the table remounts inputs every keystroke (focus loss). */
 function ServiceFormFields({ data, onChange, idPrefix = 'svc' }) {
+  const { t, i18n } = useTranslation()
+
+  const handleTranslationChange = (locale, field, value) => {
+    const translations = { ...data.translations }
+    if (!translations[locale]) translations[locale] = emptyAr()
+    translations[locale][field] = value
+    onChange({ ...data, translations })
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div className="md:col-span-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-        <input
-          type="text"
-          value={data.title}
-          onChange={(e) => onChange({ ...data, title: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
-          required
-          id={`${idPrefix}-title`}
-        />
+      <div className="md:col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+        <h3 className="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wider">{t('settings.story_en')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.name')}</label>
+            <input
+              type="text"
+              value={data.title}
+              onChange={(e) => onChange({ ...data, title: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+              required
+              id={`${idPrefix}-title`}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.description')}</label>
+            <textarea
+              value={data.description}
+              onChange={(e) => onChange({ ...data, description: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-md"
+              id={`${idPrefix}-desc`}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.long_description')}</label>
+            <textarea
+              value={data.long_description ?? ''}
+              onChange={(e) => onChange({ ...data, long_description: e.target.value })}
+              rows={5}
+              className="w-full px-3 py-2 border rounded-md"
+              id={`${idPrefix}-long`}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.highlights')}</label>
+            <textarea
+              value={data.highlights ?? ''}
+              onChange={(e) => onChange({ ...data, highlights: e.target.value })}
+              rows={5}
+              className="w-full px-3 py-2 border rounded-md font-mono text-sm"
+              placeholder={t('services.highlights_hint')}
+              id={`${idPrefix}-highlights`}
+            />
+          </div>
+        </div>
       </div>
-      <div className="md:col-span-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <textarea
-          value={data.description}
-          onChange={(e) => onChange({ ...data, description: e.target.value })}
-          rows={4}
-          className="w-full px-3 py-2 border rounded-md"
-          id={`${idPrefix}-desc`}
-        />
+
+      <div className="md:col-span-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
+        <h3 className="text-sm font-bold text-blue-500 mb-2 uppercase tracking-wider">{t('settings.story_ar')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="rtl">
+          <div className="md:col-span-2 text-right">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.name')}</label>
+            <input
+              type="text"
+              value={data.translations?.ar?.title || ''}
+              onChange={(e) => handleTranslationChange('ar', 'title', e.target.value)}
+              className="w-full px-3 py-2 border rounded-md text-right"
+              id={`${idPrefix}-title-ar`}
+            />
+          </div>
+          <div className="md:col-span-2 text-right">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.description')}</label>
+            <textarea
+              value={data.translations?.ar?.description || ''}
+              onChange={(e) => handleTranslationChange('ar', 'description', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-md text-right"
+              id={`${idPrefix}-desc-ar`}
+            />
+          </div>
+          <div className="md:col-span-2 text-right">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.long_description')}</label>
+            <textarea
+              value={data.translations?.ar?.long_description || ''}
+              onChange={(e) => handleTranslationChange('ar', 'long_description', e.target.value)}
+              rows={5}
+              className="w-full px-3 py-2 border rounded-md text-right"
+              id={`${idPrefix}-long-ar`}
+            />
+          </div>
+          <div className="md:col-span-2 text-right">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.highlights')}</label>
+            <textarea
+              value={data.translations?.ar?.highlights || ''}
+              onChange={(e) => handleTranslationChange('ar', 'highlights', e.target.value)}
+              rows={5}
+              className="w-full px-3 py-2 border rounded-md font-mono text-sm text-right"
+              placeholder={t('services.highlights_hint')}
+              id={`${idPrefix}-highlights-ar`}
+            />
+          </div>
+        </div>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+
+      <div className={`${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.slug')}</label>
         <input
           type="text"
           value={data.slug}
@@ -71,19 +242,12 @@ function ServiceFormFields({ data, onChange, idPrefix = 'svc' }) {
           id={`${idPrefix}-slug`}
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
-        <input
-          type="text"
-          value={data.icon}
-          onChange={(e) => onChange({ ...data, icon: e.target.value })}
-          className="w-full px-3 py-2 border rounded-md"
-          placeholder="e.g. code, cloud, shield"
-          id={`${idPrefix}-icon`}
-        />
+      <div className={`md:col-span-2 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.icon')}</label>
+        <ServiceIconPicker value={data.icon} onChange={(val) => onChange({ ...data, icon: val })} />
       </div>
-      <div className="md:col-span-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+      <div className={`md:col-span-2 ${i18n.dir() === 'rtl' ? 'text-right' : 'text-left'}`}>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('services.tags')}</label>
         <input
           type="text"
           value={data.tags}
@@ -97,7 +261,19 @@ function ServiceFormFields({ data, onChange, idPrefix = 'svc' }) {
   )
 }
 
+const defaultForm = () => ({
+  title: '',
+  description: '',
+  long_description: '',
+  slug: '',
+  icon: '',
+  tags: '',
+  highlights: '',
+  translations: { ar: emptyAr() },
+})
+
 export default function ServicesDataTable({ services, loading, refetch }) {
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [filters, setFilters] = useState({
     global: '',
@@ -114,21 +290,11 @@ export default function ServicesDataTable({ services, loading, refetch }) {
   const [serviceToDelete, setServiceToDelete] = useState(null)
   const [saving, setSaving] = useState(false)
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    slug: '',
-    icon: '',
-    tags: '',
-  })
+  const [formData, setFormData] = useState(defaultForm)
 
   const [editForm, setEditForm] = useState({
     id: null,
-    title: '',
-    description: '',
-    slug: '',
-    icon: '',
-    tags: '',
+    ...defaultForm(),
   })
 
   const { data: profileRes } = useQuery({
@@ -144,13 +310,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
   }
 
   const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      slug: '',
-      icon: '',
-      tags: '',
-    })
+    setFormData(defaultForm())
   }
 
   const openEdit = (svc) => {
@@ -158,9 +318,12 @@ export default function ServicesDataTable({ services, loading, refetch }) {
       id: svc.id,
       title: svc.title ?? '',
       description: svc.description ?? '',
+      long_description: svc.long_description ?? '',
       slug: svc.slug ?? '',
       icon: svc.icon ?? '',
       tags: formatTags(svc.tags),
+      highlights: formatHighlightsForForm(svc.highlights),
+      translations: normalizeTranslations(svc),
     })
     setShowEditModal(true)
   }
@@ -170,10 +333,10 @@ export default function ServicesDataTable({ services, loading, refetch }) {
     try {
       await axios.patch(SERVICES.toggleActive(svc.id), {}, { headers: authHeaders() })
       const next = !svc.is_active
-      toast.success(`Service ${next ? 'activated' : 'deactivated'}`, { duration: 2000 })
+      toast.success(next ? t('common.active') : t('common.inactive'), { duration: 2000 })
       refetch()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Request failed', { duration: 3000 })
+      toast.error(error.response?.data?.message || t('common.error'), { duration: 3000 })
       if (error.response?.status === 401) {
         localStorage.removeItem('userToken')
         navigate('/login')
@@ -189,10 +352,10 @@ export default function ServicesDataTable({ services, loading, refetch }) {
     setShowDeleteConfirm(false)
     try {
       await axios.delete(SERVICES.delete(serviceToDelete), { headers: authHeaders() })
-      toast.success('Service deleted', { duration: 2000 })
+      toast.success(t('common.success'), { duration: 2000 })
       refetch()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Delete failed', { duration: 3000 })
+      toast.error(error.response?.data?.message || t('common.error'), { duration: 3000 })
       if (error.response?.status === 401) {
         localStorage.removeItem('userToken')
         navigate('/login')
@@ -211,12 +374,12 @@ export default function ServicesDataTable({ services, loading, refetch }) {
       await axios.post(SERVICES.create, fd, {
         headers: { ...authHeaders() },
       })
-      toast.success('Service created', { duration: 2000 })
+      toast.success(t('common.success'), { duration: 2000 })
       setShowAddModal(false)
       resetForm()
       refetch()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Create failed', { duration: 3000 })
+      toast.error(error.response?.data?.message || t('common.error'), { duration: 3000 })
       if (error.response?.status === 401) {
         localStorage.removeItem('userToken')
         navigate('/login')
@@ -235,11 +398,11 @@ export default function ServicesDataTable({ services, loading, refetch }) {
       await axios.post(SERVICES.update(editForm.id), fd, {
         headers: { ...authHeaders() },
       })
-      toast.success('Service updated', { duration: 2000 })
+      toast.success(t('common.success'), { duration: 2000 })
       setShowEditModal(false)
       refetch()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Update failed', { duration: 3000 })
+      toast.error(error.response?.data?.message || t('common.error'), { duration: 3000 })
       if (error.response?.status === 401) {
         localStorage.removeItem('userToken')
         navigate('/login')
@@ -253,7 +416,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
     return (
       services?.filter((s) => {
         const statusStr = s.is_active ? 'active' : 'inactive'
-        const blob = `${s.title ?? ''} ${s.slug ?? ''} ${formatTags(s.tags)} ${s.description ?? ''}`.toLowerCase()
+        const blob = `${s.title ?? ''} ${s.slug ?? ''} ${formatTags(s.tags)} ${s.description ?? ''} ${s.long_description ?? ''}`.toLowerCase()
         return (
           (filters.global === '' || blob.includes(filters.global.toLowerCase())) &&
           (filters.title === '' || (s.title ?? '').toLowerCase().includes(filters.title.toLowerCase())) &&
@@ -272,7 +435,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
         is_active ? 'bg-[#009379] text-white' : 'bg-[#930002] text-white'
       }`}
     >
-      {is_active ? 'Active' : 'Inactive'}
+      {is_active ? t('common.active') : t('common.inactive')}
     </span>
   )
 
@@ -281,8 +444,11 @@ export default function ServicesDataTable({ services, loading, refetch }) {
     return (
       <div className="flex justify-between items-center mt-4 px-4 pb-1">
         <div className="text-xs">
-          Showing {(currentPage - 1) * rowsPerPage + 1}-{Math.min(currentPage * rowsPerPage, filtered.length)} of{' '}
-          {filtered.length}
+          {t('pagination.showing', {
+            start: (currentPage - 1) * rowsPerPage + 1,
+            end: Math.min(currentPage * rowsPerPage, filtered.length),
+            total: filtered.length,
+          })}
         </div>
         <div className="flex gap-1">
           <button
@@ -291,23 +457,24 @@ export default function ServicesDataTable({ services, loading, refetch }) {
             disabled={currentPage === 1}
             className="p-1 disabled:opacity-50"
           >
-            <FaChevronLeft className="h-4 w-4" />
+            <FaChevronLeft className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
           </button>
-          <span className="px-3 py-1">
-            Page {currentPage} of {totalPages}
-          </span>
+          <span className="px-3 py-1">{t('pagination.page_of', { current: currentPage, total: totalPages })}</span>
           <button
             type="button"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             className="p-1 disabled:opacity-50"
           >
-            <FaChevronRight className="h-4 w-4" />
+            <FaChevronRight className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
           </button>
         </div>
       </div>
     )
   }
+
+  const closeBtnClass =
+    i18n.dir() === 'rtl' ? 'fixed top-5 left-5 text-red-500 backdrop-blur-lg rounded-full z-50' : 'fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50'
 
   return (
     <div className="shadow-2xl rounded-2xl overflow-hidden bg-white">
@@ -316,17 +483,17 @@ export default function ServicesDataTable({ services, loading, refetch }) {
           type="text"
           value={filters.global}
           onChange={(e) => handleFilterChange('global', e.target.value)}
-          placeholder="Search services..."
-          className="px-3 py-2 rounded-xl shadow-sm focus:outline-2 focus:outline-primary w-full border border-primary transition-all"
+          placeholder={t('common.search')}
+          className="px-3 py-2 rounded-xl shadow-sm focus:outline-2 focus:outline-primary w-full border border-primary transition-all text-sm"
         />
         {account?.permissions?.includes('create_services') && (
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="bg-primary hover:bg-darkBlue transition-all text-white px-3 py-2 rounded-xl shadow-sm min-w-max flex items-center gap-2"
+            className="bg-primary hover:bg-darkBlue transition-all text-white px-3 py-2 rounded-xl shadow-sm min-w-max flex items-center gap-2 text-sm"
           >
             <FaPlus size={18} />
-            <span>Add service</span>
+            <span>{t('services.add_button')}</span>
           </button>
         )}
       </div>
@@ -335,30 +502,30 @@ export default function ServicesDataTable({ services, loading, refetch }) {
         <table className="w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input
                   type="text"
-                  placeholder="Title"
+                  placeholder={t('common.name')}
                   value={filters.title}
                   onChange={(e) => handleFilterChange('title', e.target.value)}
                   className="text-xs p-1 border rounded w-full"
                 />
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Icon</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('services.slug')}</th>
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('services.icon')}</th>
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('services.tags')}</th>
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.author')}</th>
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <input
                   type="text"
-                  placeholder="Status"
+                  placeholder={t('common.status')}
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
                   className="text-xs p-1 border rounded w-full"
                 />
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('contacts.date')}</th>
+              <th className="px-3 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 text-sm">
@@ -367,14 +534,14 @@ export default function ServicesDataTable({ services, loading, refetch }) {
                 <td colSpan="8" className="px-3 py-4 text-center">
                   <div className="flex justify-center items-center gap-2">
                     <FaSpinner className="animate-spin" size={18} />
-                    Loading services…
+                    {t('services.loading_table')}
                   </div>
                 </td>
               </tr>
             ) : pageRows.length === 0 ? (
               <tr>
                 <td colSpan="8" className="px-3 py-4 text-center">
-                  No services found
+                  {t('common.no_data')}
                 </td>
               </tr>
             ) : (
@@ -382,7 +549,12 @@ export default function ServicesDataTable({ services, loading, refetch }) {
                 <tr key={s.id} className="hover:bg-gray-50">
                   <td className="px-3 py-3 font-medium max-w-[200px] truncate">{s.title}</td>
                   <td className="px-3 py-3 text-gray-600 max-w-[140px] truncate">{s.slug}</td>
-                  <td className="px-3 py-3 text-gray-600">{s.icon ?? '—'}</td>
+                  <td className="px-3 py-3 text-gray-600">
+                    <div className="flex items-center gap-2">
+                      {SUPPORTED_ICONS[s.icon] ? React.createElement(SUPPORTED_ICONS[s.icon], { className: 'text-primary' }) : '—'}
+                      <span className="text-xs text-gray-400">({s.icon})</span>
+                    </div>
+                  </td>
                   <td className="px-3 py-3 text-gray-600 max-w-[180px] truncate" title={formatTags(s.tags)}>
                     {formatTags(s.tags) || '—'}
                   </td>
@@ -394,11 +566,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
                   <td className="px-3 py-3 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       {account?.permissions?.includes('edit_services') && (
-                        <button
-                          type="button"
-                          className="text-blue-500 hover:text-blue-700 p-1"
-                          onClick={() => openEdit(s)}
-                        >
+                        <button type="button" className="text-blue-500 hover:text-blue-700 p-1" onClick={() => openEdit(s)}>
                           <FaEdit size={18} />
                         </button>
                       )}
@@ -448,7 +616,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
               setShowAddModal(false)
               resetForm()
             }}
-            className="fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50"
+            className={closeBtnClass}
           >
             <XCircle size={40} />
           </button>
@@ -458,7 +626,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
             className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold mb-4">New service</h2>
+            <h2 className="text-xl font-bold mb-4">{t('services.add_title')}</h2>
             <form onSubmit={handleAdd}>
               <ServiceFormFields data={formData} onChange={setFormData} idPrefix="add" />
               <div className="flex justify-end gap-3 mt-4">
@@ -470,7 +638,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
                   }}
                   className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -478,7 +646,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
                   className="px-4 py-2 bg-primary text-white rounded-md hover:bg-darkBlue flex items-center gap-2 disabled:opacity-50"
                 >
                   {saving ? <FaSpinner className="animate-spin" /> : <FaPlus />}
-                  Create
+                  {t('common.add')}
                 </button>
               </div>
             </form>
@@ -487,12 +655,8 @@ export default function ServicesDataTable({ services, loading, refetch }) {
       )}
 
       {showEditModal && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-        >
-          <button type="button" onClick={() => setShowEditModal(false)} className="fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <button type="button" onClick={() => setShowEditModal(false)} className={closeBtnClass}>
             <XCircle size={40} />
           </button>
           <motion.div
@@ -501,12 +665,12 @@ export default function ServicesDataTable({ services, loading, refetch }) {
             className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold mb-4">Edit service</h2>
+            <h2 className="text-xl font-bold mb-4">{t('services.edit_title')}</h2>
             <form onSubmit={handleUpdate}>
               <ServiceFormFields data={editForm} onChange={setEditForm} idPrefix="edit" />
               <div className="flex justify-end gap-3 mt-4">
                 <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -514,7 +678,7 @@ export default function ServicesDataTable({ services, loading, refetch }) {
                   className="px-4 py-2 bg-primary text-white rounded-md hover:bg-darkBlue flex items-center gap-2 disabled:opacity-50"
                 >
                   {saving ? <FaSpinner className="animate-spin" /> : <FaEdit />}
-                  Save
+                  {t('common.save_changes')}
                 </button>
               </div>
             </form>
@@ -535,14 +699,14 @@ export default function ServicesDataTable({ services, loading, refetch }) {
             className="bg-white rounded-lg shadow-xl w-full max-w-md p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-medium text-gray-900">Delete service</h3>
-            <p className="mt-2 text-sm text-gray-500">This cannot be undone.</p>
+            <h3 className="text-lg font-medium text-gray-900">{t('services.delete_title')}</h3>
+            <p className="mt-2 text-sm text-gray-500">{t('services.delete_body')}</p>
             <div className="mt-5 flex justify-end gap-3">
               <button type="button" onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button type="button" onClick={handleDelete} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-                Delete
+                {t('common.delete')}
               </button>
             </div>
           </motion.div>

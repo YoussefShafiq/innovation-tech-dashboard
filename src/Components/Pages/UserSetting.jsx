@@ -4,8 +4,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { AUTH, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js';
+import { useTranslation } from 'react-i18next';
 
 export default function UserSetting() {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const [isEditing, setIsEditing] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -46,11 +48,11 @@ export default function UserSetting() {
             return axios.post(AUTH.settingsRequestUpdate, {}, { headers: authHeaders() });
         },
         onSuccess: () => {
-            toast.success('Verification code sent to your email');
+            toast.success(t('user_settings.code_sent'));
             setShowVerificationModal(true);
         },
         onError: (error) => {
-            toast.error(error.response?.data?.message || 'Failed to send verification code');
+            toast.error(error.response?.data?.message || t('user_settings.failed_send'));
         }
     });
 
@@ -78,7 +80,7 @@ export default function UserSetting() {
             });
         },
         onSuccess: () => {
-            toast.success('Profile updated successfully');
+            toast.success(t('user_settings.profile_updated'));
             queryClient.invalidateQueries(['currentUser']);
             setIsEditing(false);
             setSelectedFile(null);
@@ -88,7 +90,7 @@ export default function UserSetting() {
             setPendingFormData(null);
         },
         onError: (error) => {
-            toast.error(error.response?.data?.message || 'Failed to update profile');
+            toast.error(error.response?.data?.message || t('user_settings.failed_update'));
         }
     });
 
@@ -111,7 +113,7 @@ export default function UserSetting() {
 
     const handleVerificationSubmit = () => {
         if (!verificationCode.trim()) {
-            toast.error('Please enter verification code');
+            toast.error(t('user_settings.enter_code'));
             return;
         }
 
@@ -187,7 +189,7 @@ export default function UserSetting() {
     return (
         <div className="mx-auto p-6">
             <h1 className="text-3xl font-bold text-gray-800 mb-8">
-                Welcome {account?.name?.split(' ')?.[0] ?? 'Admin'}
+                {t('user_settings.welcome', { name: account?.name?.split(' ')?.[0] ?? t('user_settings.guest_fallback') })}
             </h1>
 
             <div className="flex flex-col gap-8">
@@ -196,7 +198,7 @@ export default function UserSetting() {
                         <div className="relative">
                             <img
                                 src={previewImage || account?.profile_image}
-                                alt="Profile"
+                                alt={t('user_settings.edit_profile')}
                                 className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
                             />
                             {isEditing && (
@@ -222,11 +224,11 @@ export default function UserSetting() {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.name')}</label>
                                 {isEditing ? (
                                     <input
                                         type="text"
-                                        {...register('name', { required: 'Name is required' })}
+                                        {...register('name', { required: t('user_settings.name_required') })}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         disabled={sendVerificationMutation.isPending}
                                     />
@@ -237,15 +239,15 @@ export default function UserSetting() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.email')}</label>
                                 {isEditing ? (
                                     <input
                                         type="email"
                                         {...register('email', {
-                                            required: 'Email is required',
+                                            required: t('user_settings.email_required'),
                                             pattern: {
                                                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message: 'Invalid email address'
+                                                message: t('user_settings.invalid_email')
                                             }
                                         })}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -258,18 +260,18 @@ export default function UserSetting() {
 
                             {/* Bio Field */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('user_settings.bio')}</label>
                                 {isEditing ? (
                                     <textarea
                                         {...register('bio')}
                                         rows={3}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Tell us about yourself..."
+                                        placeholder={t('user_settings.bio_placeholder')}
                                         disabled={sendVerificationMutation.isPending}
                                     />
                                 ) : (
                                     <p className="px-3 py-2 bg-gray-50 rounded-md whitespace-pre-line">
-                                        {account?.bio || 'No bio yet'}
+                                        {account?.bio || t('user_settings.no_bio')}
                                     </p>
                                 )}
                             </div>
@@ -277,29 +279,29 @@ export default function UserSetting() {
                             {isEditing && (
                                 <>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('user_settings.new_password')}</label>
                                         <input
                                             type="password"
                                             {...register('password')}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Leave blank to keep current password"
+                                            placeholder={t('user_settings.pass_placeholder')}
                                             disabled={sendVerificationMutation.isPending}
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('user_settings.confirm_password')}</label>
                                         <input
                                             type="password"
                                             {...register('confirmPassword', {
                                                 validate: value => {
                                                     const password = watch('password');
                                                     if (!password && !value) return true; // Both empty is OK
-                                                    return value === password || 'Passwords do not match';
+                                                    return value === password || t('user_settings.pass_mismatch');
                                                 }
                                             })}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Confirm new password"
+                                            placeholder={t('user_settings.confirm_pass_placeholder')}
                                             disabled={sendVerificationMutation.isPending}
                                         />
                                         {errors.confirmPassword && (
@@ -324,7 +326,7 @@ export default function UserSetting() {
                                         className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                                         disabled={sendVerificationMutation.isPending}
                                     >
-                                        Cancel
+                                        {t('user_settings.cancel')}
                                     </button>
                                     <button
                                         type="submit"
@@ -337,7 +339,7 @@ export default function UserSetting() {
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                             </svg>
                                         )}
-                                        {sendVerificationMutation.isPending ? 'Sending Code...' : 'Save Changes'}
+                                        {sendVerificationMutation.isPending ? t('user_settings.sending') : t('user_settings.save')}
                                     </button>
                                 </>
                             ) : (
@@ -346,7 +348,7 @@ export default function UserSetting() {
                                     onClick={() => setIsEditing(true)}
                                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                                 >
-                                    Edit Profile
+                                    {t('user_settings.edit_profile')}
                                 </button>
                             )}
                         </div>
@@ -354,7 +356,7 @@ export default function UserSetting() {
                 </div>
 
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <h2 className="text-2xl font-bold mb-6">Permissions</h2>
+                    <h2 className="text-2xl font-bold mb-6">{t('user_settings.permissions')}</h2>
                     <div className="flex flex-wrap gap-3">
                         {account?.permissions?.map((p, i) => (
                             <div key={i} className="bg-gray-100 shadow p-1 rounded-xl">{p.replaceAll('_', ' ')}</div>
@@ -369,7 +371,7 @@ export default function UserSetting() {
                     <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
 
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold">Email Verification</h3>
+                            <h3 className="text-lg font-semibold">{t('user_settings.verify_title')}</h3>
                             <button
                                 onClick={closeVerificationModal}
                                 className="text-gray-500 hover:text-gray-700"
@@ -382,19 +384,19 @@ export default function UserSetting() {
                         </div>
 
                         <p className="text-gray-600 mb-4">
-                            We&apos;ve sent a verification code (2FA) to your email. Enter it below to confirm your profile changes.
+                            {t('user_settings.verify_prompt')}
                         </p>
 
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Verification Code
+                                {t('user_settings.verify_label')}
                             </label>
                             <input
                                 type="text"
                                 value={verificationCode}
                                 onChange={(e) => setVerificationCode(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter 6-digit code"
+                                placeholder={t('user_settings.verify_placeholder')}
                                 maxLength={6}
                                 disabled={updateUserMutation.isPending}
                             />
@@ -407,7 +409,7 @@ export default function UserSetting() {
                                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                                 disabled={updateUserMutation.isPending}
                             >
-                                Cancel
+                                {t('user_settings.cancel')}
                             </button>
                             <button
                                 onClick={handleVerificationSubmit}
@@ -420,7 +422,7 @@ export default function UserSetting() {
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
                                 )}
-                                {updateUserMutation.isPending ? 'Updating...' : 'Verify & Update'}
+                                {updateUserMutation.isPending ? t('user_settings.updating') : t('user_settings.verify_submit')}
                             </button>
                         </div>
 
@@ -436,7 +438,7 @@ export default function UserSetting() {
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
                                 )}
-                                {sendVerificationMutation.isPending ? 'Sending...' : 'Resend Code'}
+                                {sendVerificationMutation.isPending ? t('user_settings.resending') : t('user_settings.resend')}
                             </button>
                         </div>
                     </div>

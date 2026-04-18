@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import TextAlign from '@tiptap/extension-text-align';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import './styles.scss';
 
 const extensions = [
@@ -24,6 +25,7 @@ const extensions = [
 
 const MenuBar = () => {
     const { editor } = useCurrentEditor();
+    const { t } = useTranslation();
 
     if (!editor) {
         return null;
@@ -36,7 +38,7 @@ const MenuBar = () => {
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run() }}
                     disabled={!editor.can().chain().focus().toggleBold().run()}
                     className={editor.isActive('bold') ? 'is-active' : ''}
-                    title="Bold"
+                    title={t('editor.bold')}
                 >
                     <Bold size={16} />
                 </button>
@@ -44,7 +46,7 @@ const MenuBar = () => {
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run() }}
                     disabled={!editor.can().chain().focus().toggleItalic().run()}
                     className={editor.isActive('italic') ? 'is-active' : ''}
-                    title="Italic"
+                    title={t('editor.italic')}
                 >
                     <Italic size={16} />
                 </button>
@@ -52,7 +54,7 @@ const MenuBar = () => {
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run() }}
                     disabled={!editor.can().chain().focus().toggleStrike().run()}
                     className={editor.isActive('strike') ? 'is-active' : ''}
-                    title="Strikethrough"
+                    title={t('editor.strikethrough')}
                 >
                     <Strikethrough size={16} />
                 </button>
@@ -64,21 +66,21 @@ const MenuBar = () => {
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 1 }).run() }}
                     className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
-                    title="Heading 1"
+                    title={t('editor.heading_n', { n: 1 })}
                 >
                     <Heading1 size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run() }}
                     className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
-                    title="Heading 2"
+                    title={t('editor.heading_n', { n: 2 })}
                 >
                     <Heading2 size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run() }}
                     className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
-                    title="Heading 3"
+                    title={t('editor.heading_n', { n: 3 })}
                 >
                     <Heading3 size={16} />
                 </button>
@@ -90,14 +92,14 @@ const MenuBar = () => {
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run() }}
                     className={editor.isActive('bulletList') ? 'is-active' : ''}
-                    title="Bullet List"
+                    title={t('editor.bullet_list')}
                 >
                     <List size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run() }}
                     className={editor.isActive('orderedList') ? 'is-active' : ''}
-                    title="Numbered List"
+                    title={t('editor.numbered_list')}
                 >
                     <ListOrdered size={16} />
                 </button>
@@ -109,20 +111,20 @@ const MenuBar = () => {
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleBlockquote().run() }}
                     className={editor.isActive('blockquote') ? 'is-active' : ''}
-                    title="Blockquote"
+                    title={t('editor.blockquote')}
                 >
                     <Quote size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleCodeBlock().run() }}
                     className={editor.isActive('codeBlock') ? 'is-active' : ''}
-                    title="Code Block"
+                    title={t('editor.code_block')}
                 >
                     <Code2 size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().setHorizontalRule().run() }}
-                    title="Horizontal Rule"
+                    title={t('editor.horizontal_rule')}
                 >
                     <Minus size={16} />
                 </button>
@@ -134,21 +136,21 @@ const MenuBar = () => {
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().setTextAlign('left').run() }}
                     className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}
-                    title="Align Left"
+                    title={t('editor.align_left')}
                 >
                     <AlignLeft size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().setTextAlign('center').run() }}
                     className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}
-                    title="Align Center"
+                    title={t('editor.align_center')}
                 >
                     <AlignCenter size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().setTextAlign('right').run() }}
                     className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}
-                    title="Align Right"
+                    title={t('editor.align_right')}
                 >
                     <AlignRight size={16} />
                 </button>
@@ -160,14 +162,14 @@ const MenuBar = () => {
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().undo().run() }}
                     disabled={!editor.can().undo()}
-                    title="Undo"
+                    title={t('editor.undo')}
                 >
                     <Undo size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().redo().run() }}
                     disabled={!editor.can().redo()}
-                    title="Redo"
+                    title={t('editor.redo')}
                 >
                     <Redo size={16} />
                 </button>
@@ -178,6 +180,7 @@ const MenuBar = () => {
 
 const CustomBubbleMenu = () => {
     const { editor } = useCurrentEditor();
+    const { t } = useTranslation();
 
     if (!editor) {
         return null;
@@ -189,46 +192,49 @@ const CustomBubbleMenu = () => {
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run() }}
                     className={editor.isActive('bold') ? 'is-active' : ''}
+                    title={t('editor.bold')}
                 >
                     <Bold size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run() }}
                     className={editor.isActive('italic') ? 'is-active' : ''}
+                    title={t('editor.italic')}
                 >
                     <Italic size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 1 }).run() }}
                     className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
+                    title={t('editor.heading_n', { n: 1 })}
                 >
                     H1
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run() }}
                     className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
-                    title="Heading 2"
+                    title={t('editor.heading_n', { n: 2 })}
                 >
                     <Heading2 size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run() }}
                     className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
-                    title="Heading 3"
+                    title={t('editor.heading_n', { n: 3 })}
                 >
                     <Heading3 size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run() }}
                     className={editor.isActive('bulletList') ? 'is-active' : ''}
-                    title="Bullet List"
+                    title={t('editor.bullet_list')}
                 >
                     <List size={16} />
                 </button>
                 <button
                     onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run() }}
                     className={editor.isActive('orderedList') ? 'is-active' : ''}
-                    title="Numbered List"
+                    title={t('editor.numbered_list')}
                 >
                     <ListOrdered size={16} />
                 </button>

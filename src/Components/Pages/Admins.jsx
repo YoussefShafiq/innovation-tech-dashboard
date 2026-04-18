@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdminsDataTable from '../DataTables/AdminsDataTable'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 import { USERS, PERMISSIONS_API, authHeaders } from '../../constants/urls.js'
 
 /** GET /api/admin/users — `data` is the user array */
@@ -17,7 +18,9 @@ function normalizePermissions(res) {
   return res?.data?.data?.all_permissions ?? []
 }
 
+
 export default function Admins() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const {
@@ -44,14 +47,14 @@ export default function Admins() {
       navigate('/login')
     }
     if (status === 403) {
-      toast.error('You are not authorized to view this page')
-      navigate('/home')
+      toast.error(t('common.not_authorized'))
+      navigate('/')
     }
-  }, [isError, error, navigate])
+  }, [isError, error, navigate, t])
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Admins</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">{t('admins.title')}</h1>
       <AdminsDataTable
         admins={normalizeUsersList(adminsRes)}
         allPermissions={normalizePermissions(permissionsRes)}

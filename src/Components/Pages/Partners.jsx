@@ -4,21 +4,21 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import ContactsDataTable from '../DataTables/ContactsDataTable'
-import { CONTACTS, authHeaders } from '../../constants/urls.js'
+import PartnersDataTable from '../DataTables/PartnersDataTable'
+import { PARTNERS_API, authHeaders } from '../../constants/urls.js'
 
-function normalizeContactsList(res) {
+function normalizePartnersList(res) {
   const raw = res?.data?.data
   return Array.isArray(raw) ? raw : []
 }
 
-export default function Contacts() {
+export default function Partners() {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const { data: contactsRes, isLoading, refetch, isError, error } = useQuery({
-    queryKey: ['contacts'],
-    queryFn: () => axios.get(CONTACTS.list, { headers: authHeaders() }),
+  const { data: partnersRes, isLoading, refetch, isError, error } = useQuery({
+    queryKey: ['partners'],
+    queryFn: () => axios.get(PARTNERS_API.list, { headers: authHeaders() }),
   })
 
   useEffect(() => {
@@ -36,12 +36,9 @@ export default function Contacts() {
 
   return (
     <div className="p-4">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">{t('contacts.title')}</h1>
-      <ContactsDataTable
-        contacts={normalizeContactsList(contactsRes)}
-        loading={isLoading}
-        refetch={refetch}
-      />
+      <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('partners.title')}</h1>
+      <p className="text-gray-600 mb-8 text-sm max-w-2xl">{t('partners.subtitle')}</p>
+      <PartnersDataTable partners={normalizePartnersList(partnersRes)} loading={isLoading} refetch={refetch} />
     </div>
   )
 }

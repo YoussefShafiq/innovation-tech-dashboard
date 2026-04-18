@@ -18,8 +18,10 @@ import {
 } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
 import { XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminsDataTable({ admins, allPermissions, loading, refetch }) {
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [filters, setFilters] = useState({
         global: '',
@@ -70,10 +72,10 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
         try {
             await axios.patch(USERS.toggleActive(admin.id), {}, { headers: authHeaders() });
             const next = !admin.is_active;
-            toast.success(`Admin ${next ? 'activated' : 'deactivated'} successfully`, { duration: 2000 });
+            toast.success(next ? t('admins.activated') : t('admins.deactivated'), { duration: 2000 });
             refetch();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'An unexpected error occurred', { duration: 3000 });
+            toast.error(error.response?.data?.message || t('common.unexpected_error'), { duration: 3000 });
             if (error.response?.status == 401) {
                 localStorage.removeItem('userToken')
                 navigate('/login')
@@ -96,17 +98,17 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
 
         try {
             await axios.delete(USERS.delete(adminToDelete), { headers: authHeaders() });
-            toast.success('Admin deleted successfully', { duration: 2000 });
+            toast.success(t('admins.deleted'), { duration: 2000 });
             refetch();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'An unexpected error occurred', { duration: 3000 });
+            toast.error(error.response?.data?.message || t('common.unexpected_error'), { duration: 3000 });
             if (error.response?.status == 401) {
                 localStorage.removeItem('userToken')
                 navigate('/login')
             }
             if (error.response?.status == 403) {
-                toast.error('You are not authorized to view this page')
-                navigate('/home')
+                toast.error(t('common.not_authorized'))
+                navigate('/')
             }
         } finally {
             setDeletingAdminId(null);
@@ -174,7 +176,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            toast.error('Passwords do not match', { duration: 3000 });
+            toast.error(t('admins.password_mismatch'), { duration: 3000 });
             return;
         }
 
@@ -199,20 +201,20 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                 );
             }
             setUpdatingAdmin(false);
-            toast.success('Admin added successfully', { duration: 2000 });
+            toast.success(t('admins.added'), { duration: 2000 });
             setShowAddModal(false);
             resetForm();
             refetch();
         } catch (error) {
             setUpdatingAdmin(false);
-            toast.error(error.response?.data?.message || 'An unexpected error occurred', { duration: 3000 });
+            toast.error(error.response?.data?.message || t('common.unexpected_error'), { duration: 3000 });
             if (error.response?.status == 401) {
                 localStorage.removeItem('userToken')
                 navigate('/login')
             }
             if (error.response?.status == 403) {
-                toast.error('You are not authorized to view this page')
-                navigate('/home')
+                toast.error(t('common.not_authorized'))
+                navigate('/')
             }
         }
     };
@@ -221,7 +223,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
         e.preventDefault();
 
         if (formData.password && formData.password !== formData.confirmPassword) {
-            toast.error('Passwords do not match', { duration: 3000 });
+            toast.error(t('admins.password_mismatch'), { duration: 3000 });
             return;
         }
 
@@ -240,20 +242,20 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                 headers: { ...authHeaders(), 'Content-Type': 'application/json' },
             });
             setUpdatingAdmin(false);
-            toast.success('Admin updated successfully', { duration: 2000 });
+            toast.success(t('admins.updated'), { duration: 2000 });
             setShowEditModal(false);
             resetForm();
             refetch();
         } catch (error) {
             setUpdatingAdmin(false);
-            toast.error(error.response?.data?.message || 'An unexpected error occurred', { duration: 3000 });
+            toast.error(error.response?.data?.message || t('common.unexpected_error'), { duration: 3000 });
             if (error.response?.status == 401) {
                 localStorage.removeItem('userToken')
                 navigate('/login')
             }
             if (error.response?.status == 403) {
-                toast.error('You are not authorized to view this page')
-                navigate('/home')
+                toast.error(t('common.not_authorized'))
+                navigate('/')
             }
         }
     };
@@ -269,20 +271,20 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                 { headers: { ...authHeaders(), 'Content-Type': 'application/json' } }
             );
             setUpdatingAdmin(false);
-            toast.success('Permissions updated successfully', { duration: 2000 });
+            toast.success(t('admins.perms_updated'), { duration: 2000 });
             setShowPermissionsModal(false);
             resetForm();
             refetch();
         } catch (error) {
             setUpdatingAdmin(false);
-            toast.error(error.response?.data?.message || 'An unexpected error occurred', { duration: 3000 });
+            toast.error(error.response?.data?.message || t('common.unexpected_error'), { duration: 3000 });
             if (error.response?.status == 401) {
                 localStorage.removeItem('userToken')
                 navigate('/login')
             }
             if (error.response?.status == 403) {
-                toast.error('You are not authorized to view this page')
-                navigate('/home')
+                toast.error(t('common.not_authorized'))
+                navigate('/')
             }
         }
     };
@@ -315,7 +317,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
             : 'bg-[#930002] text-white';
         return (
             <span className={`flex justify-center w-fit items-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass} min-w-16 text-center`}>
-                {is_active ? 'Active' : 'Inactive'}
+                {is_active ? t('common.active') : t('common.inactive')}
             </span>
         );
     };
@@ -326,7 +328,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
         return (
             <div className="flex justify-between items-center mt-4 px-4 pb-1">
                 <div className='text-xs'>
-                    Showing {((currentPage - 1) * rowsPerPage + 1)}-{Math.min(currentPage * rowsPerPage, filteredAdmins.length)} of {filteredAdmins.length} entries
+                    {t('pagination.showing', { start: (currentPage - 1) * rowsPerPage + 1, end: Math.min(currentPage * rowsPerPage, filteredAdmins.length), total: filteredAdmins.length })}
                 </div>
                 <div className="flex gap-1">
                     <button
@@ -334,22 +336,24 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                         disabled={currentPage === 1}
                         className="p-1 disabled:opacity-50"
                     >
-                        <FaChevronLeft className="h-4 w-4" />
+                        <FaChevronLeft className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
                     </button>
                     <span className="px-3 py-1">
-                        Page {currentPage} of {totalPages}
+                        {t('pagination.page_of', { current: currentPage, total: totalPages })}
                     </span>
                     <button
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
                         className="p-1 disabled:opacity-50"
                     >
-                        <FaChevronRight className="h-4 w-4" />
+                        <FaChevronRight className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
             </div>
         );
     };
+
+    const closeBtnClass = i18n.dir() === 'rtl' ? 'fixed top-5 left-5 text-red-500 backdrop-blur-lg rounded-full z-50' : 'fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50';
 
     return (
         <div className="shadow-2xl rounded-2xl overflow-hidden bg-white">
@@ -359,7 +363,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                     type="text"
                     value={filters.global}
                     onChange={(e) => handleFilterChange('global', e.target.value)}
-                    placeholder="Search admins..."
+                    placeholder={t('admins.search')}
                     className="px-3 py-2 rounded-xl shadow-sm focus:outline-2 focus:outline-primary w-full border border-primary transition-all"
                 />
                 {account?.permissions?.includes('create_admins') && <button
@@ -367,7 +371,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                     className="bg-primary hover:bg-darkBlue transition-all text-white px-3 py-2 rounded-xl shadow-sm min-w-max flex items-center gap-2"
                 >
                     <FaPlus size={18} />
-                    <span>Add Admin</span>
+                    <span>{t('admins.add')}</span>
                 </button>}
             </div>
 
@@ -379,7 +383,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <input
                                     type="text"
-                                    placeholder="Name"
+                                    placeholder={t('common.name')}
                                     value={filters.name}
                                     onChange={(e) => handleFilterChange('name', e.target.value)}
                                     className="text-xs p-1 border rounded w-full"
@@ -388,26 +392,26 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <input
                                     type="text"
-                                    placeholder="Email"
+                                    placeholder={t('common.email')}
                                     value={filters.email}
                                     onChange={(e) => handleFilterChange('email', e.target.value)}
                                     className="text-xs p-1 border rounded w-full"
                                 />
                             </th>
                             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Role
+                                {t('common.role')}
                             </th>
                             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <input
                                     type="text"
-                                    placeholder="Status"
+                                    placeholder={t('common.status')}
                                     value={filters.status}
                                     onChange={(e) => handleFilterChange('status', e.target.value)}
                                     className="text-xs p-1 border rounded w-full"
                                 />
                             </th>
                             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
+                                {t('common.actions')}
                             </th>
                         </tr>
                     </thead>
@@ -417,14 +421,14 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                 <td colSpan="5" className="px-3 py-4 text-center">
                                     <div className="flex justify-center items-center gap-2">
                                         <FaSpinner className="animate-spin" size={18} />
-                                        Loading admins...
+                                        {t('admins.loading')}
                                     </div>
                                 </td>
                             </tr>
                         ) : paginatedAdmins.length === 0 ? (
                             <tr>
                                 <td colSpan="5" className="px-3 py-4 text-center">
-                                    No admins found
+                                    {t('admins.empty')}
                                 </td>
                             </tr>
                         ) : (
@@ -437,7 +441,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         {admin.email}
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap capitalize text-gray-600">
-                                        Admin
+                                        {t('admins.role_admin')}
                                     </td>
                                     <td className="px-3 py-4 whitespace-nowrap">
                                         {statusBadge(admin.is_active)}
@@ -503,9 +507,9 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
                 >
-                    <button onClick={() => {
+                    <button type="button" onClick={() => {
                         setShowAddModal(false);
-                    }} className='fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50' >
+                    }} className={closeBtnClass} >
                         <XCircle className='' size={40} />
                     </button>
                     <motion.div
@@ -516,11 +520,11 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-6">
-                            <h2 className="text-xl font-bold mb-4">Add New Admin</h2>
+                            <h2 className="text-xl font-bold mb-4">{t('admins.add_title')}</h2>
                             <form onSubmit={handleAddAdmin}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.name')}</label>
                                         <input
                                             type="text"
                                             name="name"
@@ -531,7 +535,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.email')}</label>
                                         <input
                                             type="email"
                                             name="email"
@@ -545,7 +549,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.password')}</label>
                                         <input
                                             type="password"
                                             name="password"
@@ -556,7 +560,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.confirm_password')}</label>
                                         <input
                                             type="password"
                                             name="confirmPassword"
@@ -569,7 +573,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admins.permissions_title')}</label>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -580,7 +584,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="mb-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
                                     >
-                                        Select All
+                                        {t('admins.select_all')}
                                     </button>
                                     <button
                                         type="button"
@@ -592,7 +596,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="mb-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded ml-2"
                                     >
-                                        Clear All
+                                        {t('admins.clear_all')}
                                     </button>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-2 border rounded">
                                         {allPermissions.map(permission => (
@@ -622,7 +626,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
                                     >
-                                        Cancel
+                                        {t('common.cancel')}
                                     </button>
                                     <button
                                         type="submit"
@@ -632,12 +636,12 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         {updatingAdmin ? (
                                             <>
                                                 <FaSpinner className="animate-spin" size={18} />
-                                                <span>Adding...</span>
+                                                <span>{t('admins.adding')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <FaPlus size={18} />
-                                                <span>Add Admin</span>
+                                                <span>{t('admins.add')}</span>
                                             </>
                                         )}
                                     </button>
@@ -656,9 +660,9 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
                 >
-                    <button onClick={() => {
+                    <button type="button" onClick={() => {
                         setShowEditModal(false);
-                    }} className='fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50' >
+                    }} className={closeBtnClass} >
                         <XCircle className='' size={40} />
                     </button>
                     <motion.div
@@ -669,11 +673,11 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-6">
-                            <h2 className="text-xl font-bold mb-4">Edit Admin</h2>
+                            <h2 className="text-xl font-bold mb-4">{t('admins.edit_title')}</h2>
                             <form onSubmit={handleUpdateAdmin}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.name')}</label>
                                         <input
                                             type="text"
                                             name="name"
@@ -684,7 +688,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.email')}</label>
                                         <input
                                             type="email"
                                             name="email"
@@ -698,7 +702,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">New Password (leave blank to keep current)</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admins.new_password_hint')}</label>
                                         <input
                                             type="password"
                                             name="password"
@@ -708,7 +712,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.confirm_password')}</label>
                                         <input
                                             type="password"
                                             name="confirmPassword"
@@ -728,7 +732,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
                                     >
-                                        Cancel
+                                        {t('common.cancel')}
                                     </button>
                                     <button
                                         type="submit"
@@ -738,12 +742,12 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         {updatingAdmin ? (
                                             <>
                                                 <FaSpinner className="animate-spin" size={18} />
-                                                <span>Updating...</span>
+                                                <span>{t('admins.updating')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <FaEdit size={18} />
-                                                <span>Update Admin</span>
+                                                <span>{t('admins.update_admin_btn')}</span>
                                             </>
                                         )}
                                     </button>
@@ -762,9 +766,9 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
                 >
-                    <button onClick={() => {
+                    <button type="button" onClick={() => {
                         setShowPermissionsModal(false);
-                    }} className='fixed top-5 right-5 text-red-500 backdrop-blur-lg rounded-full z-50' >
+                    }} className={closeBtnClass} >
                         <XCircle className='' size={40} />
                     </button>
                     <motion.div
@@ -776,11 +780,11 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                     >
                         <div className="p-6">
                             <h2 className="text-xl font-bold mb-4">
-                                Manage Permissions for {selectedAdmin?.name}
+                                {t('admins.manage_perms_for', { name: selectedAdmin?.name ?? '' })}
                             </h2>
                             <form onSubmit={handleUpdatePermissions}>
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admins.permissions_title')}</label>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -791,7 +795,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="mb-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
                                     >
-                                        Select All
+                                        {t('admins.select_all')}
                                     </button>
                                     <button
                                         type="button"
@@ -803,7 +807,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="mb-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded ml-2"
                                     >
-                                        Clear All
+                                        {t('admins.clear_all')}
                                     </button>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-2 border rounded">
                                         {allPermissions.map(permission => (
@@ -833,7 +837,7 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         }}
                                         className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
                                     >
-                                        Cancel
+                                        {t('common.cancel')}
                                     </button>
                                     <button
                                         type="submit"
@@ -843,12 +847,12 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                         {updatingAdmin ? (
                                             <>
                                                 <FaSpinner className="animate-spin" size={18} />
-                                                <span>Updating...</span>
+                                                <span>{t('admins.updating')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <FaLock size={18} />
-                                                <span>Update Permissions</span>
+                                                <span>{t('admins.update_perms_btn')}</span>
                                             </>
                                         )}
                                     </button>
@@ -881,10 +885,10 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                     <FaTrashAlt className="h-5 w-5 text-red-600" />
                                 </div>
                                 <div className="ml-4">
-                                    <h3 className="text-lg font-medium text-gray-900">Delete Admin</h3>
+                                    <h3 className="text-lg font-medium text-gray-900">{t('admins.delete_title')}</h3>
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
-                                            Are you sure you want to delete this admin? This action cannot be undone.
+                                            {t('admins.delete_body')} {t('admins.delete_confirm_detail')}
                                         </p>
                                     </div>
                                 </div>
@@ -895,14 +899,14 @@ export default function AdminsDataTable({ admins, allPermissions, loading, refet
                                     onClick={() => setShowDeleteConfirm(false)}
                                     className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
                                 >
-                                    Cancel
+                                    {t('common.cancel')}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleConfirmDelete}
                                     className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                                 >
-                                    Delete
+                                    {t('common.delete')}
                                 </button>
                             </div>
                         </div>

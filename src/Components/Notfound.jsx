@@ -1,20 +1,22 @@
 import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
-<Helmet>
-    <title>Page Not Found | Sehtnaa</title>
-    <meta name="robots" content="noindex" />
-    <meta name="description" content="The page you're looking for doesn't exist." />
-</Helmet>
 export default function Notfound() {
-    const navigate = useNavigate();
-    useEffect(() => {
-        navigate('/');
-        // window.__STATUS__ = 404;
+  const { t } = useTranslation()
+  const navigate = useNavigate()
 
-    }, []);
-    return <>
+  useEffect(() => {
+    navigate('/')
+  }, [navigate])
 
+  return (
+    <>
+      <Helmet>
+        <title>{t('notfound.title')}</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
     </>
+  )
 }
