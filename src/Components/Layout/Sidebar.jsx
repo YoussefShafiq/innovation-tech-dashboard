@@ -152,25 +152,23 @@ export default function Sidebar() {
           <GoSidebarExpand className={`text-2xl ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`} />
         </button>
       </div>
-      <div className="h-full bg-primary rounded-2xl p-5 pt-10 flex flex-col justify-between overflow-y-auto shadow-xl">
-        <div>
-          <div className="flex justify-center items-center overflow-hidden mb-2 mx-auto">
-            <LogoMark className="w-full" />
-          </div>
-          <div className="flex flex-col gap-1 text-gray-400 text-base">
-            {sidebarPages.map((p) => (
-              <React.Fragment key={p.path}>
-                {(account?.permissions?.includes(p.permission) || p.permission === '') && (
-                  <NavLink className="px-4 py-2 rounded-xl flex items-center gap-2" to={p.path}>
-                    <div>{p.icon}</div>
-                    {p.title}
-                  </NavLink>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+      <div className="h-full bg-primary rounded-2xl p-5 pt-10 flex flex-col overflow-hidden shadow-xl">
+        <div className="flex justify-center items-center overflow-hidden mb-2 mx-auto shrink-0">
+          <LogoMark className="w-full" />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="sidebar-nav-links flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 text-gray-400 text-base">
+          {sidebarPages.map((p) => (
+            <React.Fragment key={p.path}>
+              {(account?.permissions?.includes(p.permission) || p.permission === '') && (
+                <NavLink className="px-4 py-2 rounded-xl flex items-center gap-2" to={p.path}>
+                  <div>{p.icon}</div>
+                  {p.title}
+                </NavLink>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2 shrink-0 pt-2">
           <button
             type="button"
             onClick={() => i18n.changeLanguage(i18n.language.startsWith('ar') ? 'en' : 'ar')}

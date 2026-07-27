@@ -1,0 +1,225 @@
+/* Scoped marketing-inspired preview — does not affect admin chrome */
+.page-preview {
+  --pp-bg: #0b1220;
+  --pp-surface: #ffffff;
+  --pp-muted: #64748b;
+  --pp-text: #0f172a;
+  --pp-primary: #0ea5e9;
+  --pp-primary-soft: rgba(14, 165, 233, 0.12);
+  --pp-secondary: #1e3a5f;
+  --pp-border: #e2e8f0;
+  background: #f1f5f9;
+  padding: 0.75rem;
+  min-height: 280px;
+}
+
+.page-preview.is-rtl .page-preview-frame {
+  direction: rtl;
+  text-align: right;
+}
+
+.page-preview-frame {
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--pp-border);
+  background: var(--pp-surface);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.page-preview-hero {
+  background: linear-gradient(145deg, #0b1220 0%, #1e3a5f 55%, #0f2744 100%);
+  color: #fff;
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  position: relative;
+}
+
+.page-preview-hero::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1.5rem;
+  background: linear-gradient(to top, #fff, transparent);
+}
+
+.page-preview-eyebrow,
+.page-preview-tag {
+  color: var(--pp-primary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.page-preview-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+.page-preview-sub {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  opacity: 0.75;
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.page-preview-body {
+  padding: 1.25rem;
+  background: #fff;
+  color: var(--pp-text);
+}
+
+.page-preview-card {
+  border: 1px solid var(--pp-border);
+  border-radius: 0.85rem;
+  padding: 0.9rem;
+  background: #fff;
+}
+
+.page-preview-card + .page-preview-card {
+  margin-top: 0.65rem;
+}
+
+.page-preview-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pp-muted);
+  margin-bottom: 0.25rem;
+}
+
+.page-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.75rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.65rem;
+  background: var(--pp-primary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.page-preview-input {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--pp-border);
+  background: #f8fafc;
+  font-size: 0.75rem;
+  color: var(--pp-muted);
+}
+
+.page-preview-placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.page-preview-section.is-dimmed {
+  display: none;
+}
+
+.page-preview-section.is-active {
+  display: block;
+  animation: pp-fade 0.25s ease;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.22);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+@keyframes pp-fade {
+  from {
+    opacity: 0.4;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-preview-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(11, 18, 32, 0.92);
+  color: #fff;
+}
+
+.page-preview-nav-brand {
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.page-preview-nav-brand span:last-child {
+  color: var(--pp-primary);
+}
+
+.page-preview-nav-links {
+  display: none;
+  gap: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+@media (min-width: 420px) {
+  .page-preview-nav-links {
+    display: flex;
+  }
+}
+
+.page-preview-footer {
+  background: #0b1220;
+  color: #cbd5e1;
+  padding: 1.25rem;
+  font-size: 0.75rem;
+}
+
+.page-preview-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+@media (min-width: 380px) {
+  .page-preview-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.page-preview-chip {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--pp-primary-soft);
+  color: var(--pp-primary);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.page-preview-step-num {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.55rem;
+  background: var(--pp-primary-soft);
+  color: var(--pp-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.7rem;
+  margin-bottom: 0.4rem;
+}

@@ -49,3 +49,25 @@
     background-color: transparent;
     /* Transparent background */
 }
+
+/* Sidebar nav links: scroll only here, transparent scrollbar */
+.sidebar-nav-links {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.sidebar-nav-links::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav-links::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav-links::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.sidebar-nav-links::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+}

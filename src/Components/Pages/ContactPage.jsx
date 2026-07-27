@@ -6,6 +6,8 @@ import toast from 'react-hot-toast'
 import { FaSpinner, FaSave } from 'react-icons/fa'
 import { useTranslation } from 'react-i18next'
 import { AUTH, PAGES_API, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
+import PreviewShell from '../PagePreview/PreviewShell.jsx'
+import ContactPreview from '../PagePreview/ContactPreview.jsx'
 
 const SECTIONS = ['hero', 'info', 'form']
 
@@ -224,6 +226,7 @@ export default function ContactPageEditor() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState('hero')
+  const [previewLocale, setPreviewLocale] = useState('en')
   const [form, setForm] = useState(() => ({ en: emptyContent(), ar: emptyContent() }))
 
   const { data: profileRes, isLoading: profileLoading } = useQuery({
@@ -328,23 +331,33 @@ export default function ContactPageEditor() {
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-8">
-        {isLoading ? (
-          <div className="flex items-center gap-2 text-gray-600 py-12 justify-center">
-            <FaSpinner className="animate-spin" />
-            {t('common.loading')}
-          </div>
-        ) : (
-          <SectionEditor
-            sectionKey={activeSection}
-            en={form.en}
-            ar={form.ar}
-            onChangeEn={(next) => setForm((prev) => ({ ...prev, en: next }))}
-            onChangeAr={(next) => setForm((prev) => ({ ...prev, ar: next }))}
-            readOnly={!canEdit}
-            t={t}
-          />
-        )}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] gap-6 items-start mb-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          {isLoading ? (
+            <div className="flex items-center gap-2 text-gray-600 py-12 justify-center">
+              <FaSpinner className="animate-spin" />
+              {t('common.loading')}
+            </div>
+          ) : (
+            <SectionEditor
+              sectionKey={activeSection}
+              en={form.en}
+              ar={form.ar}
+              onChangeEn={(next) => setForm((prev) => ({ ...prev, en: next }))}
+              onChangeAr={(next) => setForm((prev) => ({ ...prev, ar: next }))}
+              readOnly={!canEdit}
+              t={t}
+            />
+          )}
+        </div>
+
+        <PreviewShell
+          title={t(`pages.contact_sections.${activeSection}`)}
+          previewLocale={previewLocale}
+          onPreviewLocaleChange={setPreviewLocale}
+        >
+          <ContactPreview content={form[previewLocale]} activeSection={activeSection} />
+        </PreviewShell>
       </div>
 
       {canEdit && !isLoading && (
