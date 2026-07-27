@@ -35,8 +35,6 @@ function storyBulletsFromArValue(arVal) {
 }
 
 const emptyAr = () => ({
-  our_mission: '',
-  our_vision: '',
   story_title: '',
   story_subtitle: '',
   story_description: '',
@@ -74,57 +72,6 @@ function SettingsFormFields({ form, onChange, readOnly }) {
               />
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-t pt-8">
-        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-          <h2 className="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">{t('settings.mission_vision_en')}</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings.mission_label')}</label>
-              <textarea
-                rows={3}
-                value={form.our_mission}
-                onChange={(e) => onChange({ ...form, our_mission: e.target.value })}
-                {...ro}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings.vision_label')}</label>
-              <textarea
-                rows={3}
-                value={form.our_vision}
-                onChange={(e) => onChange({ ...form, our_vision: e.target.value })}
-                {...ro}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100" dir="rtl">
-          <h2 className="text-sm font-bold text-blue-500 mb-4 uppercase tracking-wider">{t('settings.mission_vision_ar')}</h2>
-          <div className="space-y-4">
-            <div className="text-right">
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings.mission_label')}</label>
-              <textarea
-                rows={3}
-                value={form.translations?.ar?.our_mission || ''}
-                onChange={(e) => handleTranslationChange('our_mission', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-right border-blue-200 focus:border-blue-500 outline-none"
-                readOnly={readOnly}
-              />
-            </div>
-            <div className="text-right">
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings.vision_label')}</label>
-              <textarea
-                rows={3}
-                value={form.translations?.ar?.our_vision || ''}
-                onChange={(e) => handleTranslationChange('our_vision', e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-right border-blue-200 focus:border-blue-500 outline-none"
-                readOnly={readOnly}
-              />
-            </div>
-          </div>
         </div>
       </section>
 
@@ -272,8 +219,6 @@ function mapApiToForm(data) {
     projects: data.projects ?? '',
     clients: data.clients ?? '',
     engineers: data.engineers ?? '',
-    our_mission: data.our_mission ?? '',
-    our_vision: data.our_vision ?? '',
     story_title: s.title ?? '',
     story_subtitle: s.subtitle ?? '',
     story_description: s.description ?? '',
@@ -283,8 +228,6 @@ function mapApiToForm(data) {
     address: data.address ?? '',
     translations: {
       ar: {
-        our_mission: ar.our_mission ?? '',
-        our_vision: ar.our_vision ?? '',
         story_title: ar.story_title ?? '',
         story_subtitle: ar.story_subtitle ?? '',
         story_description: ar.story_description ?? '',
@@ -304,8 +247,6 @@ export default function Settings() {
     projects: '',
     clients: '',
     engineers: '',
-    our_mission: '',
-    our_vision: '',
     story_title: '',
     story_subtitle: '',
     story_description: '',
@@ -362,8 +303,6 @@ export default function Settings() {
         projects: Number(form.projects) || 0,
         clients: Number(form.clients) || 0,
         engineers: Number(form.engineers) || 0,
-        our_mission: form.our_mission,
-        our_vision: form.our_vision,
         story_title: form.story_title,
         story_subtitle: form.story_subtitle,
         story_description: form.story_description,

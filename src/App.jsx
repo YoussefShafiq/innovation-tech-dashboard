@@ -18,6 +18,10 @@ import ErrorPage from './Components/errorHandling/ErrorPage'
 import Admins from './Components/Pages/Admins.jsx'
 import Partners from './Components/Pages/Partners.jsx'
 import HomePage from './Components/Pages/HomePage.jsx'
+import AboutPage from './Components/Pages/AboutPage.jsx'
+import ServicesPage from './Components/Pages/ServicesPage.jsx'
+import ContactPage from './Components/Pages/ContactPage.jsx'
+import TeamMembers from './Components/Pages/TeamMembers.jsx'
 
 function AppToaster() {
   const { i18n } = useTranslation()
@@ -40,7 +44,11 @@ function App() {
         { path: '/services', element: <ProtectedRoute><Services /></ProtectedRoute> },
         { path: '/contacts', element: <ProtectedRoute><Contacts /></ProtectedRoute> },
         { path: '/partners', element: <ProtectedRoute><Partners /></ProtectedRoute> },
+        { path: '/team-members', element: <ProtectedRoute><TeamMembers /></ProtectedRoute> },
         { path: '/pages/home', element: <ProtectedRoute><HomePage /></ProtectedRoute> },
+        { path: '/pages/about', element: <ProtectedRoute><AboutPage /></ProtectedRoute> },
+        { path: '/pages/services', element: <ProtectedRoute><ServicesPage /></ProtectedRoute> },
+        { path: '/pages/contact', element: <ProtectedRoute><ContactPage /></ProtectedRoute> },
         { path: '/settings', element: <ProtectedRoute><Settings /></ProtectedRoute> },
         { path: '/user-setting', element: <ProtectedRoute><UserSetting /></ProtectedRoute> },
 

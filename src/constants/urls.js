@@ -82,3 +82,13 @@ export const PARTNERS_API = {
 export const PAGES_API = {
   detail: (pageKey) => `${BASE_URL}/pages/${encodeURIComponent(pageKey)}`,
 }
+
+/** About page team members — multipart POST create/update */
+export const TEAM_API = {
+  list: `${BASE_URL}/team-members`,
+  create: `${BASE_URL}/team-members`,
+  update: (encodedId) => `${BASE_URL}/team-members/${encodeURIComponent(encodedId)}`,
+  delete: (encodedId) => `${BASE_URL}/team-members/${encodeURIComponent(encodedId)}`,
+  toggleActive: (encodedId) =>
+    `${BASE_URL}/team-members/${encodeURIComponent(encodedId)}/toggle-active`,
+}

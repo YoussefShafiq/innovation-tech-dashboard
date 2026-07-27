@@ -12,8 +12,8 @@ import { RiAdminLine } from 'react-icons/ri'
 import { ImProfile } from 'react-icons/im'
 import { HiMail } from 'react-icons/hi'
 import { IoSettingsOutline } from 'react-icons/io5'
-import { FaHandshake, FaHome } from 'react-icons/fa'
-import { MdLanguage } from 'react-icons/md'
+import { FaHandshake, FaHome, FaUsers } from 'react-icons/fa'
+import { MdLanguage, MdInfoOutline, MdMiscellaneousServices, MdContactMail } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
 import { AUTH, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
 
@@ -83,9 +83,33 @@ export default function Sidebar() {
       permission: 'view_partners',
     },
     {
+      title: t('sidebar.team'),
+      path: '/team-members',
+      icon: <FaUsers />,
+      permission: 'view_team',
+    },
+    {
       title: t('sidebar.home_page'),
       path: '/pages/home',
       icon: <FaHome />,
+      permission: 'view_pages',
+    },
+    {
+      title: t('sidebar.about_page'),
+      path: '/pages/about',
+      icon: <MdInfoOutline />,
+      permission: 'view_pages',
+    },
+    {
+      title: t('sidebar.services_page'),
+      path: '/pages/services',
+      icon: <MdMiscellaneousServices />,
+      permission: 'view_pages',
+    },
+    {
+      title: t('sidebar.contact_page'),
+      path: '/pages/contact',
+      icon: <MdContactMail />,
       permission: 'view_pages',
     },
     {
