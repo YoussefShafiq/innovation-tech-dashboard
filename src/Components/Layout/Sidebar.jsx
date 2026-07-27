@@ -13,7 +13,7 @@ import { ImProfile } from 'react-icons/im'
 import { HiMail } from 'react-icons/hi'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { FaHandshake, FaHome, FaUsers } from 'react-icons/fa'
-import { MdLanguage, MdInfoOutline, MdMiscellaneousServices, MdContactMail } from 'react-icons/md'
+import { MdLanguage, MdInfoOutline, MdMiscellaneousServices, MdContactMail, MdViewQuilt } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
 import { AUTH, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
 
@@ -110,6 +110,12 @@ export default function Sidebar() {
       title: t('sidebar.contact_page'),
       path: '/pages/contact',
       icon: <MdContactMail />,
+      permission: 'view_pages',
+    },
+    {
+      title: t('sidebar.layout_page'),
+      path: '/pages/layout',
+      icon: <MdViewQuilt />,
       permission: 'view_pages',
     },
     {

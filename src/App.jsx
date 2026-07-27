@@ -21,6 +21,7 @@ import HomePage from './Components/Pages/HomePage.jsx'
 import AboutPage from './Components/Pages/AboutPage.jsx'
 import ServicesPage from './Components/Pages/ServicesPage.jsx'
 import ContactPage from './Components/Pages/ContactPage.jsx'
+import LayoutPage from './Components/Pages/LayoutPage.jsx'
 import TeamMembers from './Components/Pages/TeamMembers.jsx'
 
 function AppToaster() {
@@ -49,6 +50,7 @@ function App() {
         { path: '/pages/about', element: <ProtectedRoute><AboutPage /></ProtectedRoute> },
         { path: '/pages/services', element: <ProtectedRoute><ServicesPage /></ProtectedRoute> },
         { path: '/pages/contact', element: <ProtectedRoute><ContactPage /></ProtectedRoute> },
+        { path: '/pages/layout', element: <ProtectedRoute><LayoutPage /></ProtectedRoute> },
         { path: '/settings', element: <ProtectedRoute><Settings /></ProtectedRoute> },
         { path: '/user-setting', element: <ProtectedRoute><UserSetting /></ProtectedRoute> },
 
