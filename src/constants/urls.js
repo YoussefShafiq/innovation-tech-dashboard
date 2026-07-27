@@ -2,7 +2,7 @@
  * Innovation Tech API — matches Postman `innovation-tech.json`:
  * `{{base_url}}/api/admin/auth/...` (default base_url = production API)
  */
-const API_ORIGIN = (import.meta.env.VITE_API_URL ?? 'https://api.xeron.tech').replace(/\/$/, '')
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '')
 
 export const BASE_URL = `${API_ORIGIN}/api/admin`
 
@@ -76,4 +76,9 @@ export const PARTNERS_API = {
   delete: (encodedId) => `${BASE_URL}/partners/${encodeURIComponent(encodedId)}`,
   toggleActive: (encodedId) =>
     `${BASE_URL}/partners/${encodeURIComponent(encodedId)}/toggle-active`,
+}
+
+/** Page CMS sections — GET/PUT `/api/admin/pages/{pageKey}` */
+export const PAGES_API = {
+  detail: (pageKey) => `${BASE_URL}/pages/${encodeURIComponent(pageKey)}`,
 }

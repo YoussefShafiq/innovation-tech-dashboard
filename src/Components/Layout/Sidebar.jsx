@@ -12,7 +12,7 @@ import { RiAdminLine } from 'react-icons/ri'
 import { ImProfile } from 'react-icons/im'
 import { HiMail } from 'react-icons/hi'
 import { IoSettingsOutline } from 'react-icons/io5'
-import { FaHandshake } from 'react-icons/fa'
+import { FaHandshake, FaHome } from 'react-icons/fa'
 import { MdLanguage } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
 import { AUTH, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
@@ -81,6 +81,12 @@ export default function Sidebar() {
       path: '/partners',
       icon: <FaHandshake />,
       permission: 'view_partners',
+    },
+    {
+      title: t('sidebar.home_page'),
+      path: '/pages/home',
+      icon: <FaHome />,
+      permission: 'view_pages',
     },
     {
       title: t('sidebar.settings'),

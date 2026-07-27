@@ -17,6 +17,7 @@ import Settings from './Components/Pages/Settings'
 import ErrorPage from './Components/errorHandling/ErrorPage'
 import Admins from './Components/Pages/Admins.jsx'
 import Partners from './Components/Pages/Partners.jsx'
+import HomePage from './Components/Pages/HomePage.jsx'
 
 function AppToaster() {
   const { i18n } = useTranslation()
@@ -39,6 +40,7 @@ function App() {
         { path: '/services', element: <ProtectedRoute><Services /></ProtectedRoute> },
         { path: '/contacts', element: <ProtectedRoute><Contacts /></ProtectedRoute> },
         { path: '/partners', element: <ProtectedRoute><Partners /></ProtectedRoute> },
+        { path: '/pages/home', element: <ProtectedRoute><HomePage /></ProtectedRoute> },
         { path: '/settings', element: <ProtectedRoute><Settings /></ProtectedRoute> },
         { path: '/user-setting', element: <ProtectedRoute><UserSetting /></ProtectedRoute> },
 
