@@ -2,7 +2,7 @@
  * Innovation Tech API — matches Postman `innovation-tech.json`:
  * `{{base_url}}/api/admin/auth/...` (default base_url = production API)
  */
-const API_ORIGIN = (import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '')
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? 'https://api.xeron.tech').replace(/\/$/, '')
 
 export const BASE_URL = `${API_ORIGIN}/api/admin`
 
