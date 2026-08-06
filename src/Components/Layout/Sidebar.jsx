@@ -7,11 +7,10 @@ import { SidebarContext } from '../../Contexts/SidebarContext'
 import { GoSidebarExpand } from 'react-icons/go'
 import { CiLogout } from 'react-icons/ci'
 import { useQuery } from '@tanstack/react-query'
-import { IoConstructOutline } from 'react-icons/io5'
+import { IoConstructOutline, IoSettingsOutline, IoColorPaletteOutline } from 'react-icons/io5'
 import { RiAdminLine } from 'react-icons/ri'
 import { ImProfile } from 'react-icons/im'
 import { HiMail } from 'react-icons/hi'
-import { IoSettingsOutline } from 'react-icons/io5'
 import { FaHandshake, FaHome, FaUsers } from 'react-icons/fa'
 import { MdLanguage, MdInfoOutline, MdMiscellaneousServices, MdContactMail, MdViewQuilt } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
@@ -122,6 +121,12 @@ export default function Sidebar() {
       title: t('sidebar.settings'),
       path: '/settings',
       icon: <IoSettingsOutline />,
+      permission: 'view_settings',
+    },
+    {
+      title: t('sidebar.site_colors'),
+      path: '/settings/colors',
+      icon: <IoColorPaletteOutline />,
       permission: 'view_settings',
     },
     {

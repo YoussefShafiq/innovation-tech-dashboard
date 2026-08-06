@@ -2,7 +2,7 @@
  * Innovation Tech API — matches Postman `innovation-tech.json`:
  * `{{base_url}}/api/admin/auth/...` (default base_url = production API)
  */
-const API_ORIGIN = (import.meta.env.VITE_API_URL ?? 'https://api.xeron.tech').replace(/\/$/, '')
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '')
 
 export const BASE_URL = `${API_ORIGIN}/api/admin`
 
@@ -66,6 +66,12 @@ export const CONTACTS = {
 /** Postman: GET + PUT JSON global site settings (`/api/admin/settings`) */
 export const SETTINGS = {
   resource: `${BASE_URL}/settings`,
+}
+
+/** Site theme colors — GET/PUT `/api/admin/theme`, POST `/api/admin/theme/reset` */
+export const THEME = {
+  resource: `${BASE_URL}/theme`,
+  reset: `${BASE_URL}/theme/reset`,
 }
 
 /** Home page partner logos — multipart POST create/update like services */

@@ -14,6 +14,7 @@ import Home from './Components/Pages/Home'
 import UserSetting from './Components/Pages/UserSetting'
 import Contacts from './Components/Pages/Contacts'
 import Settings from './Components/Pages/Settings'
+import SiteColors from './Components/Pages/SiteColors'
 import ErrorPage from './Components/errorHandling/ErrorPage'
 import Admins from './Components/Pages/Admins.jsx'
 import Partners from './Components/Pages/Partners.jsx'
@@ -52,6 +53,7 @@ function App() {
         { path: '/pages/contact', element: <ProtectedRoute><ContactPage /></ProtectedRoute> },
         { path: '/pages/layout', element: <ProtectedRoute><LayoutPage /></ProtectedRoute> },
         { path: '/settings', element: <ProtectedRoute><Settings /></ProtectedRoute> },
+        { path: '/settings/colors', element: <ProtectedRoute><SiteColors /></ProtectedRoute> },
         { path: '/user-setting', element: <ProtectedRoute><UserSetting /></ProtectedRoute> },
 
       ]

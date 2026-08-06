@@ -681,7 +681,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "https://api.xeron.tech"
+			"value": "http://127.0.0.1:8000"
 		},
 		{
 			"key": "admin_token",
