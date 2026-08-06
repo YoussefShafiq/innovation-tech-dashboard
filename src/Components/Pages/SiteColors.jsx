@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { FaSpinner, FaSave, FaCopy, FaUndo } from 'react-icons/fa'
+import { FaSpinner, FaSave, FaCopy, FaUndo, FaTrash, FaUpload } from 'react-icons/fa'
 import { useTranslation } from 'react-i18next'
 import { AUTH, THEME, authHeaders, getAccountFromProfileResponse } from '../../constants/urls.js'
 
@@ -207,11 +207,98 @@ function ThemePreview({ form }) {
   )
 }
 
+function LogoSection({ logoUrl, canEdit, onUploaded, onRemoved }) {
+  const { t } = useTranslation()
+  const fileRef = useRef(null)
+
+  const uploadMutation = useMutation({
+    mutationFn: async (file) => {
+      const fd = new FormData()
+      fd.append('logo', file)
+      return axios.post(THEME.logo, fd, { headers: authHeaders() })
+    },
+    onSuccess: (res) => {
+      toast.success(t('theme.logo_upload_success'), { duration: 2000 })
+      onUploaded(res?.data?.data?.logo ?? null)
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || t('theme.logo_upload_failed'), { duration: 4000 })
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => axios.delete(THEME.logo, { headers: authHeaders() }),
+    onSuccess: () => {
+      toast.success(t('theme.logo_remove_success'), { duration: 2000 })
+      onRemoved()
+      if (fileRef.current) fileRef.current.value = ''
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || t('theme.logo_remove_failed'), { duration: 4000 })
+    },
+  })
+
+  const busy = uploadMutation.isPending || deleteMutation.isPending
+
+  return (
+    <section>
+      <h2 className="text-lg font-semibold text-gray-800 mb-1">{t('theme.logo_title')}</h2>
+      <p className="text-sm text-gray-500 mb-4">{t('theme.logo_hint')}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/60">
+        <div className="h-20 w-20 rounded-xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
+          {logoUrl ? (
+            <img src={logoUrl} alt="" className="max-h-full max-w-full object-contain p-1.5" />
+          ) : (
+            <span className="text-xs text-gray-400 text-center px-2">{t('theme.logo_empty')}</span>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 flex-1">
+          {canEdit && (
+            <>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) uploadMutation.mutate(file)
+                }}
+              />
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => fileRef.current?.click()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-darkBlue transition-colors disabled:opacity-50 text-sm font-semibold"
+              >
+                {uploadMutation.isPending ? <FaSpinner className="animate-spin" /> : <FaUpload />}
+                {t('theme.logo_upload')}
+              </button>
+              {logoUrl && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => deleteMutation.mutate()}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 text-sm font-semibold"
+                >
+                  {deleteMutation.isPending ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+                  {t('theme.logo_remove')}
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function SiteColors() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [form, setForm] = useState(() => ({ ...THEME_DEFAULTS }))
+  const [logoUrl, setLogoUrl] = useState(null)
 
   const { data: profileRes, isLoading: profileLoading } = useQuery({
     queryKey: ['currentUser'],
@@ -234,9 +321,13 @@ export default function SiteColors() {
   })
 
   useEffect(() => {
-    const theme = themeRes?.data?.data?.theme
+    const payload = themeRes?.data?.data
+    const theme = payload?.theme
     if (theme && typeof theme === 'object') {
       setForm({ ...THEME_DEFAULTS, ...theme })
+    }
+    if (payload && 'logo' in payload) {
+      setLogoUrl(payload.logo || null)
     }
   }, [themeRes])
 
@@ -340,10 +431,23 @@ export default function SiteColors() {
           </div>
         ) : (
           <div className="space-y-8">
+            <LogoSection
+              logoUrl={logoUrl}
+              canEdit={canEdit}
+              onUploaded={(url) => {
+                setLogoUrl(url)
+                queryClient.invalidateQueries({ queryKey: ['siteTheme'] })
+              }}
+              onRemoved={() => {
+                setLogoUrl(null)
+                queryClient.invalidateQueries({ queryKey: ['siteTheme'] })
+              }}
+            />
+
             <ThemePreview form={form} />
 
             {COLOR_GROUPS.map((group) => (
-              <section key={group.id} className="border-t pt-6 first:border-t-0 first:pt-0">
+              <section key={group.id} className="border-t pt-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-3">{t(group.titleKey)}</h2>
                 <div className="space-y-3">
                   {group.keys.map((key) => (

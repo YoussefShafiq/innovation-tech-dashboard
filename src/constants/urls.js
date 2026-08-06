@@ -68,10 +68,11 @@ export const SETTINGS = {
   resource: `${BASE_URL}/settings`,
 }
 
-/** Site theme colors — GET/PUT `/api/admin/theme`, POST `/api/admin/theme/reset` */
+/** Site theme colors — GET/PUT `/api/admin/theme`, POST `/api/admin/theme/reset`, logo upload */
 export const THEME = {
   resource: `${BASE_URL}/theme`,
   reset: `${BASE_URL}/theme/reset`,
+  logo: `${BASE_URL}/theme/logo`,
 }
 
 /** Home page partner logos — multipart POST create/update like services */
